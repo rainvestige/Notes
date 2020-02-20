@@ -18,6 +18,7 @@ Ref:
 
 6. 在主界面->参数设置->
   core:基础设置->Http代理：开启Http代理，并自动配置代理服务器
+  
   core:路由设置->一键设置默认自定义路由规则
 
 7. click any area in `server list`, press Ctrl+A 全选所有服务器，之
