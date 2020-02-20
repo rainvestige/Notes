@@ -26,3 +26,32 @@ Ref:
 
 8. 右击任务栏右下角v2rayN图标->服务器->选择一个可以用的服务器。接下来
   就可以愉快的上网了。
+  
+## 2. Android Install
+
+#
+1. Download the `v2rayNG` from 
+  [here](https://github.com/2dust/v2rayNG/releases) and install the `.apk` file
+
+2. 点击左上角菜单按钮展开菜单->订阅设置->点击右上角
+  “+”，remarks随便填，URL填写你的v2ray订阅地址并点击右上角“√”保存
+
+3. 回到软件主界面->点击右上角“更多”按钮->更新订阅
+
+4. 选择一个节点，点击右下角按钮订阅
+
+## 3. Linux Install
+
+#
+1. Download the `Qv2ray.***.AppImage` from 
+  [here](https://github.com/Qv2ray/Qv2ray/releases)
+
+2. Bash command
+    ```bash
+    chmod +x Qv2ray.***.AppImage
+    ./Qv2ray.***.AppImage
+    ```
+
+3. Configure the `Qv2ray`
+    
+    TODO: subscription setting and proxy setting
