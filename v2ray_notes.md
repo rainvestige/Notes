@@ -59,7 +59,7 @@ Ref:
 >  * 主界面->订阅->左下方添加按钮
 >  * Subscription Name: 随便取
 >  * Subscription Address: 填写你的订阅地址
->  * Update Interval: 更改为1天
+>  * Update Interval: 更改为5天
 >  * 最后点击右下方的 __更新订阅数据__ 并确定
 >
 >  - 主界面->Preferences-General Setting->V2ray setting
