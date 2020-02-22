@@ -52,8 +52,8 @@ make && sudo make install
 1. syntax highlight and shortcuts setting 
    [.vimrc](https://github.com/VundleVim/Vundle.vim)
 
-2. plugin setting
-
+2. plugin setting 
+   [my .vimrc file](https://github.com/rainvestige/Notes/blob/master/vim/.vimrc)
 
 # Plugins Install
 
