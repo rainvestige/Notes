@@ -1,4 +1,5 @@
 let mapleader=" "
+let maplocalleader=" "
 syntax on
 set number
 set relativenumber
@@ -21,6 +22,9 @@ let &t_ut=''
 
 set foldmethod=indent
 set foldlevel=99
+let &t_SI.= "\e[5 q" "SI = INSERT model
+let &t_SR.= "\e[4 q" "SR = REPLACE model
+let &t_EI.= "\e[1 q" "EI = NORMAL model(else)
 let &t_SI = "\<Esc>]50;CursorShape=1\x7"
 let &t_SR = "\<Esc>]50;CursorShape=2\x7"
 let &t_EI = "\<Esc>]50;CursorShape=0\x7"
@@ -64,8 +68,9 @@ set tabstop=4
 set expandtab
 set autoindent
 "------------------------------------------------------------"
-" Convert word to uppercase
+" Convert word to Uppercase
 inoremap <C-u> <esc>gUiwea
+inoremap <C-j> <esc>bgUlea
 "------------------------------------------------------------"
 " Plugins will be downloaded under the specified directory.
 call plug#begin('~/.vim/plugged')
@@ -99,22 +104,28 @@ Plug 'gko/vim-coloresque', { 'for': ['vim-plug', 'php', 'html', 'javascript', 'c
 Plug 'pangloss/vim-javascript', { 'for' :['javascript', 'vim-plug'] }
 Plug 'mattn/emmet-vim'
 
+" latex
+Plug 'lervag/vimtex'
+" Snippet plugin -- ultisnips
+Plug 'SirVer/ultisnips'
+
 " List ends here. Plugins become visible to Vim after this call.
 call plug#end()
+
 "------------------------------------------------------------"
 "==
 "== Plugins Setting
 "==
 "------------------------------------------------------------"
 
-
 "==  
 "== colorscheme setting
 "==
 syntax enable
-set background=dark
+set background=light
 let g:solarized_termcolors=256
-let g:solarized_termtrans=1
+let g:solarized_termtrans=0
+let g:solarized_visibility="high"
 colorscheme solarized
 
 "==  
@@ -127,10 +138,12 @@ nnoremap gr :YcmCompleter GoToReferences<CR>
 let g:ycm_autoclose_preview_window_after_completion=0
 let g:ycm_autoclose_preview_window_after_insertion=1
 let g:ycm_use_clangd = 0
-let g:ycm_python_interpreter_path = "/usr/bin/python3"
-let g:ycm_python_binary_path = "/usr/bin/python3"
+let g:ycm_python_interpreter_path = "/home/xinyu/anaconda3/envs/py3/bin/python3"
+let g:ycm_python_binary_path = "/home/xinyu/anaconda3/envs/py3/bin"
 
-let g:ycm_python_sys_path = ['/usr/lib/python3.6/', '/usr/lib/python3']
+let g:ycm_python_sys_path = [
+  \   '/home/xinyu/anaconda3/envs/py3/lib/python3.6/',
+  \   '/home/xinyu/anaconda3/envs/py3/lib/python3.6/site-packages/']
 let g:ycm_extra_conf_vim_data = [
   \  'g:ycm_python_interpreter_path',
   \  'g:ycm_python_sys_path'
@@ -142,6 +155,7 @@ let g:ycm_global_ycm_extra_conf = '~/.vim/plugged/YouCompleteMe/global_extra_con
 "==
 let b:ale_linters = ['pylint']
 let b:ale_fixers = ['autopep8', 'yapf']
+let g:ale_echo_msg_error_str = 'error'
 
 " ==
 " == MarkdownPreview setting
@@ -202,7 +216,6 @@ let NERDTreeMapPreview = ""
 let NERDTreeMapCloseDir = "n"
 let NERDTreeMapChangeRoot = "y"
 
-
 " ==
 " == NERDTree-git
 " ==
@@ -217,3 +230,18 @@ let g:NERDTreeIndicatorMapCustom = {
     \ "Clean"     : "✔︎",
     \ "Unknown"   : "?"
     \ }
+
+" ==
+" == LaTex: vimtex plugin setting
+" ==
+let g:tex_flavor='latex'  
+let g:vimtex_view_method='zathura'  
+let g:vimtex_quickfix_mode=1  
+set conceallevel=1  
+let g:tex_conceal='abdmg'
+let g:vimtex_compiler_latexmk = {
+    \ 'options' : [
+    \   '-xelatex',
+    \   
+    \ ],
+    \}

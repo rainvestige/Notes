@@ -68,3 +68,7 @@ make && sudo make install
 
 4. Configure your plugin setting in your .vimrc file
 
+#
+# vim user doc
+## REF: 
+1. [user_doc](http://vimcdoc.sourceforge.net/doc/usr_toc.html#usr_toc.txt)
