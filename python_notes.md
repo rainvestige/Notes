@@ -447,6 +447,7 @@ def hello(name, language='en'):
 ```
 
 # Chapter 5: Date and Time
+> Modules: datetime, dateutil, pytz
 
 # 5.1 Parsing a string into a **timezone** aware datetime object
 ```python
@@ -462,10 +463,202 @@ By default all datetime objects are naive. To make them timezone-aware, you must
 attach a `tzinfo` object, which provides the UTC offset and timezone abbreviation
 as a function of date and time.
 
-## Fixed Offset Time Zones
+## Fixed Offset **Time Zones**
 For time zones that are a fixed offset from UTC, in Python3.2+, the `datetime` 
 module provides the timezone class, a concrete implementation of tzinfo, which
 takes a timedelta and an(optional) name paremeter:
+
+```python
+from datetime import datetime, timedelta, timezone
+CCT = timezone(timedelta(hours=+8)) # china 东八区
+
+dt = datetime(2020, 3, 21, 10, 27, 0, tzinfo=CCT)
+print(dt)
+# 2020-03-21 10:27:00+08:00
+
+print(dt.tzname())
+# UTC+08:00
+
+# JST: japan 东九区
+dt = datetime(2020, 3, 21, 10, 27, 00, tzinfo=timezone(timedelta(hours=9), 'JST'))
+print(dt.tzname())
+# JST
+```
+
+不同的方法构建时区对象(timezone object)
+
+```python 
+from datetime import datetime, timedelta
+from dateutil import tz
+
+CCT = tz.tzoffset('CCT', 8 * 3600)
+dt = datetime(2020, 3, 21, 11, 14, tzinfo=CCT)
+print(dt)
+# 2020-03-21 11:14:00+08:00
+print(dt.tzname())
+# CCT
+```
+
+## Zones with daylight savings time
+For zones with daylight savings time, python standard libraries do not provide
+a standard class, so it is necessary to use a third party library. `pytz` and
+`dateutil` are popular libraries provide timezone classes.
+
+```python
+from datetime import datetime
+from dateutil import tz
+local = tz.gettz() # local time
+PT = tz.gettz('US/Pacific') #Pacific time
+
+dt_1 = datetime(2020, 3, 21, 12, tzinfo=local)
+dt_pst = datetime(2020, 3, 21, 12, tzinfo=PT)
+dt_pdt = datetime(2020, 7, 21, 12, tzinfo=PT)
+print(dt_1)
+# 2020-03-21 12:00:00+08:000
+print(dt_pst)
+print(dt_pdt)
+```
+
+All edge cases are handled properly when using `pytz`, but `pytz` time zones
+should not be directly attached to time zones through the constructor. Instead,
+a `pytz` time zone should be attached using the time zone's localize method:
+
+```python
+from datetime import datetime, timedelta
+import pytz
+
+PT = pytz.timezone('US/Pacific')
+dt_pst = PT.localize(datetime(2020, 3, 21, 12))
+dt_pdt = PT.localize(datetime(2020, 6, 21, 0, 30))
+
+print(dt_pst)
+print(dt_pdt)
+
+# Be aware that if you perform datetime arithmetic on a pytz-aware time zone,
+# you must either perform the calculations in UTC(if you want absolute elapsed 
+# time), or you must call `normalize()` on the result.
+
+dt_new = dt_pdt + timedelta(hours=3)
+print(dt_new)
+
+dt_corrected = PT.normalize(dt_new)
+print(dt_corrected)
+```
+
+# 5.3 Computing time differences
+The `timedelta` module comes in handy to compute differences between times:
+
+```python
+from datetime import datetime, timedelta
+now = datetime.now()
+then = datetime(2020, 3, 21)
+
+delta = now - then
+# delta is of type `timedelta`
+print(delta.days)
+
+print(delta.seconds)
+
+print(delta.microseconds)
+```
+
+To get n days after and n days before date we could use:
+```python
+def get_n_days_after_date(date_format='%d %B %Y', add_days=120):
+    date_n_days_after = datetime.datetime.now() + timedelta(days=add_days)
+    return date_n_days_after.strftime(date_format)
+
+
+def get_n_days_before_date(date_format='%d %B %Y', days_before=120):
+    date_n_days_before = datetime.datetime.now() - timedelta(days=days_before)
+    return date_n_days_before.strftime(date_format)
+```
+
+# 5.4 Basic datetime objects usage
+The datetime module contains three primary types of objects - date, time, and datetime
+
+```
+import datetime
+
+# Date object
+today = datetime.date.today()
+new_year = datetime.date(2020, 01, 01)
+
+# Time oject
+noon = datetime.time(12, 0, 0)
+
+# Current datetime
+now = datetime.datetime.now()
+
+# Datetime object
+millenium_turn = datetime.datetime(2000, 1, 1, 0, 0, 0)
+```
+
+Arithmetic operations for these objects are only supported within same datetype
+and performing simple arithmetic with instances of different types will result
+in a TypeError.
+
+# 5.5 Switching between time zones
+To switch between time zones, you need datetime objects that are timezone-aware.
+
+```python
+from datetime import datetime
+from dateutil import tz
+
+utc = tz.tzutc()
+local = tz.tzlocal()
+
+utc_now = datetime.utcnow() # Not timezone-aware
+
+utc_now = utc_now.replace(tzinfo=utc)
+utc_now # Timezone-aware
+
+local_now = utc_now.astimezone(local)
+local_now # Converted to local time
+```
+
+# 5.6 Simple date arithmetic
+
+```python
+import datetime
+today = datetime.date.today()
+
+yesterday = today - datetime.timedelta(days=1)
+
+```
+
+# 5.7 Converting timestamp to datetime
+The datetime module can convert a POSIX timestamp to a ITC datetime object.
+
+The Epoch is January 1st, 1970 midnight.
+```python
+import time
+from datetime import datetime
+seconds_since_epoch = time.time() # timestamp?
+
+utc_date = datetime.utcfromtimestamp(seconds_since_epoch)
+# daatetime.datetime(2020, 3, 21, 9, 13, 46, 984290)
+```
+
+# 5.8 Subtracting months from a date accurately
+Using the `calendar` module
+
+```python
+import calendar
+from datetime import date
+
+def monthdelta(date, delta):
+    m, y = (date.month + delta) % 12, date.year + ((date.month) + delta - 1) // 12
+
+
+
+
+
+
+
+
+
+
 
 
 # Decorators
