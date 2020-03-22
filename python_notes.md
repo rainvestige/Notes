@@ -649,16 +649,144 @@ from datetime import date
 
 def monthdelta(date, delta):
     m, y = (date.month + delta) % 12, date.year + ((date.month) + delta - 1) // 12
+    if not m: m = 12
+    d = min(date.day, calendar.monthrange(y, m)[1])
+    return date.replace(day = d, month = m, year = y)
+
+next_month = monthdelta(date.today(), 1)
+
+# Using the `dateutils` module
+import datetime
+import dateutil.relative delta
+
+d = datetime.datetime.strptime('2020-03-31', '%Y-%m-$d')
+d2 = d = dateutil.relativedelta.relativedelta(months=1)
+# datetime.datetime(2020, 2, 29, 0, 0)
+```
+
+# 5.9 Parsing an arbitrary ISO 8601 timestamp with minimal libraries
+Python has only limited support for parsing ISO 8601 timestamps. For strptime
+you need to know exactly what format it is in. As a complication the 
+stringification of a datetime is an ISO 8601 timestamp, with space as a separator
+and 6 digit fraction:
+
+```python
+str(datetime.datetime(2020, 3, 22, 14, 18, 59, 555555))
+# '2020-03-22 14:18:59.555555'
+```
+
+# 5.10 Get an ISO 8601 timestamp
+
+## Without timezone, with microseconds
+```python
+from datetime import datetime
+
+datetime.now().isoformat()
+# '2020-03-22T14:21:27.846723'
+```
+
+## With timezone, with microseconds
+```python
+from datetime import datetime
+from dateutil.tz import tzlocal
+
+datetime.now(tzlocal()).isoformat()
+# '2020-03-22T14:23:51.203451+08:00'
+```
+
+## With timezone, without microseconds
+```python
+from datetime import datetime
+from dateutil.tz import tzlocal
+
+datetime.now(tzlocal()).replace(microsecond=0).isoformat()
+# '2020-03-22T14:26:07+08:00'
+```
+
+# 5.11 Parsing a string with a short time zone name into a timezone aware datetime object
+For dates formatted with shorttime zone names or abbreviations, which are 
+generally ambiguous or not necessarily available in standard database, it is
+necessary to specify a mapping between time zone abbreviation and tzinfo object.
+
+```python
+from dateutil import tz
+from dateutil.parser import parse
+
+ET = tz.gettz('US/Rastern')
+CT = tz.gettz('US/Central')
+MT = tz.gettz('US/Mountain')
+PT = tz.gettz('US/Pacific')
+
+us_tzinfos = {
+    'CST': CT, 'CDT': CT,
+    'EST': ET, 'EDT': ET,
+    'MST': MT, 'MDT': MT,
+    'PST': PT, 'PDT': PT
+}
+
+dt_est = parse('2014-01-02 04:00:00 EST', tzinfos=us_tzinfos)
+# datetime.datetime(2014, 1, 2, 4, 0, tzinfo=tzfile('usr/share/zoneinfo/US/Eastern')
+dt_pst = parse('2014-01-02 04:00:00 PST', tzinfos=us_tzinfos)
+```
+
+# 5.12 Fuzzy datetime parsing(extracting datetime out of a text)
+It is possible to extract a date out of a text using the `dateutil parser` in a 
+`fuzzy` mode, where components of the string not recognized as being part of a 
+date are ignored.
+```python
+from dateutil.parser import parse
+
+dt = parse("Today is March 21, 2020 at 15:16 PM", fuzzy=True)
+```
+
+# 5.13 Iterate over dates
+Sometimes you want to iterate over a range of dates from a start date to some
+end date. You can do it using `datetime` library and `timedelta` object.
+```python
+from datetime import date,timedelta
+
+# The size of each step in days
+day_delta = timedelta(days=1)
+
+start_date = date.today()
+end_date = start_date + 7 * day_delta
+
+for i in range((end_date - start_date).days):
+    print(start_date + i*date_delta)
+```
 
 
+# Chapter 6: Date Formatting
 
+# 6.1 Time between two date-times
 
+```python
+from datetime import datetime
 
+a = datetime(2020, 3, 22, 0, 0, 0)
+b = datetime(2020, 3, 11, 23, 59, 59)
 
+a-b
+(a-b).days
+(a-b).total_seconds()
+```
 
+# 6.2 Outputting datetime object to string
 
+```python
+from datetime import datetime
+datetime_for_string = datetime(2020, 3, 22, 0, 0)
+date_string_format = '%b %d %Y, %H:%M:%S'
+datetime.strftime(datetime_for_string, datetime_string_format)  # return a string
+```
 
+# 6.3 Parsing string to datetime object
 
+```python
+from datetime import datetime
+datetime_string = 'Oct 1 2020, 10:23:43'
+datetime_string_format = '%b %d %Y, %H:%M:%S'  # the format must match the datetime_string
+datetime.strptime(datetime_string, datetime_string_format)
 
 
 # Decorators
