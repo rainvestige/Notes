@@ -787,7 +787,231 @@ from datetime import datetime
 datetime_string = 'Oct 1 2020, 10:23:43'
 datetime_string_format = '%b %d %Y, %H:%M:%S'  # the format must match the datetime_string
 datetime.strptime(datetime_string, datetime_string_format)
+```
 
+
+# Chapter 7: Enum
+
+# 7.1 Creating an enum
+Enums have been backported() from Python 3.4 to Python 2.4 through Python 3.3
+
+```bash
+pip install enum34
+```
+
+```python
+from enum import Enum
+
+class Color(Enum):
+    red = 1
+    green = 2
+    blue = 3
+
+print(Color.red)
+print(Color(1))
+print(Color['red'])
+```
+
+# 7.2 Iteration
+Enums are iterable
+```python
+[c for c in Color] # [<Color.red: 1>, <Color.green: 2 >, <Color.blue: 3 >]
+```
+
+
+# Chapter 8: Set
+
+# 8.1 Operation on sets
+
+## with other sets
+```python
+# Intersection
+{1, 2, 3, 4}.intersection({3, 4, 5})  # {3, 4}
+{1, 2, 3, 4} & {3, 4, 5}
+
+# Union
+{1, 2, 3, 4}.union({3, 4, 5})  # {1, 2, 3, 4, 5}
+{1, 2, 3, 4} | {3, 4, 5}
+
+# Difference
+{1, 2, 3, 4}.difference({3, 4, 5})  # {1, 2}
+{1, 2, 3, 4} - {3, 4, 5}            # {1, 2}
+
+# symmetric difference with
+{1, 2, 3, 4}.symmetric_difference({3, 4, 5})  # {1, 2, 5}
+{1, 2, 3, 4} ^ {3, 4, 5}            # {1, 2, 5}
+
+# Superset check
+{1, 2}.issuperset({1, 2, 3})  # False
+{1, 2} >= {1, 2, 3}           # False
+
+# Subset check
+{1, 2}.issubset({1, 2, 3})  # True
+{1, 2} <= {1, 2, 3}         # True
+
+# Disjoint check
+{1, 2}.isdisjoint({3, 4})  # True
+{1, 2}.isdisjoint({1, 4})  # False
+```
+
+# with single elements
+```python
+# Existence check
+2 in {1, 2, 3}  # True
+4 in {1, 2, 3}  # False
+4 not in {1, 2, 3}  # True
+
+# Add and Remove
+s = {1, 2, 3}
+s.add(4)  # s == {1, 2, 3, 4}
+
+s.discard(3)  # s == {1, 2, 4}
+s.discard(5)  # s == {1, 2, 4}
+
+s.remove(2)   # s == {1, 4}
+s.remove(2)   # KeyError!
+```
+
+| method               | in-place operation | in-place method             |
+|----------------------|--------------------|-----------------------------|
+| union                | s \|=t             | update                      |
+| intersection         | s &= t             | intersection_update
+| difference           | s -= t             | difference_update           |
+| symmetric_difference | s ^= t             | symmetric_difference_update |
+
+For example:
+```python
+s = {1, 2}
+s.update({3, 4})  # s == {1, 2, 3, 4}
+```
+
+# 8.2 Get the unique elements of a list
+Let's say you've got a list of restaurants -- maybe you read it from a file.
+You care about the unique restaurants in the list. The best way to get the unique
+elements from a list is to turn it into a set:
+```python
+restaurants = ["McDonald's", "Burger King", "McDonald's", "Chicken Chicken"]
+unique_restaurants = set(restaurants)
+```
+Note that the set is not **in the same order** as the original list; that is 
+because sets are **unordered**, just like `dict`.
+
+# 8.3 Set of Sets
+`{1, 2}, {3, 4}}`
+
+leads to:
+
+`TypeError: unhashable type: 'set'`
+
+Instead, use `frozenset`:
+
+`{frozenset({1, 2}), frozenset({3, 4})}`
+
+# 8.4 Set Operations using Methods and Builtins
+the same as 8.1, the only difference is replace the {1,2,...} with the variables
+
+# 8.5 Sets versus multisets
+Sets are unordered collections of distinct elements. But sometimes we want to 
+work with unordered collections of elements that are not necessarily distinct
+and keep track of the elements's multiplicities. List object can do this, but 
+a list data structure introduces an extra unneeded ordering that will slow down
+our our computations.
+
+For implementing multisets Python provides the Counter class from the `collections`
+module(starting from version 2.7)
+```python
+from collections import Counter
+counterA = Counter(['a', 'b', 'b', 'c'])  # Counter({'b': 2, 'a': 1, 'c': 1})
+```
+Counter is a dictionary where elements are stored as dictionary keys and their
+counts are stored as dictionary values. And as all dictionaries, it is an 
+unordered collection.
+
+
+# Chapter 9: Simple Mathematical Operators
+
+# 9.1 Division
+Python does integer division when both operands are integers. The behavior of
+Python's division operators have changed from python 2.x and 3.x
+```python
+a, b, c, d, e = 3, 2, 2.0, -3, 10
+
+a / b  # = 1
+a / c  # = 1.5
+d / b  # = -2
+b / a  # = 0
+d / e  # = -1o
+```
+
+What if you want float division:
+```python
+from __future__ import division  # apply Python3 style division to the entire module
+a / b   # 1.5
+a // b  # 1
+
+# In Python 3 the / operator performs `true` division regardless of types. The // 
+operator performs floor division and maintains type.
+
+a / b  # 1.5
+e / b  # 5.0
+
+a // b # 1
+a // c # 1.0
+```
+
+# 9.2 Addition
+```python
+a, b = 1, 2
+a + b  # = 3
+a += b
+
+import operator
+operator.add(a, b)
+operator.iadd(a, b)   # The '+=' operator is equivalent to
+```
+Note: the `+` operator is also used for concatenating strings, lists and tuples:
+```
+"first_string" + "second string"  
+[1, 2, 3] + [4, 5, 6]
+```
+
+# 9.3 Exponentiation
+```python
+a, b = 2, 3
+(a ** b)
+pow(a, b)
+
+import math
+math.pow(a, b)
+
+import operator
+operator.pow(a, b)
+
+# Another difference between the built-in pow and math.pow is that the built-in
+# pow can accept three arguments:
+a , b, c = 2, 3, 2
+
+pow(2, 3, 2)  # 0, calculates (2 ** 3) % 2
+```
+
+## Special functions
+```python
+import math
+import cmath  # complex math?
+
+c = 4
+math.sqrt(c)   # = 2.0 (always float; does not allow complex results)
+cmath.sqrt(c)  # = (2 + 0j) (always complex)
+
+x = 8
+math.pow(x, 1/3)
+x ** (1/3)
+```
+
+The function math.exp(x) computes e ** x
+
+math.exp(0)  # = 1
+math.exp(1)  # = 2.71828(e)
 
 # Decorators
 - commonly used in frameworks
