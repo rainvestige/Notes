@@ -995,6 +995,7 @@ pow(2, 3, 2)  # 0, calculates (2 ** 3) % 2
 ```
 
 ## Special functions
+
 ```python
 import math
 import cmath  # complex math?
@@ -1007,12 +1008,122 @@ x = 8
 math.pow(x, 1/3)
 x ** (1/3)
 ```
+The function math.exp(x) computes `e ** x`.
+The function math.expm1(x) computes `e ** x - 1`. When x is samll, this gives 
+significantly better precision than `math.exp(x) - 1`
 
-The function math.exp(x) computes e ** x
-
+```python
 math.exp(0)  # = 1
 math.exp(1)  # = 2.71828(e)
+```
 
+# 9.4 Trigonometric Functions
+```python
+a, b = 1, 2
+
+import math
+
+math.sin(a)  # returns the sine of 'a' in radians
+
+math.cosh(b) # returns the inverse hyperbolic cosine of 'b' in radians
+
+math.atan(math.pi)  # returns the arc tangent of 'pi' in radians
+
+math.hypot(a, b)  # returns the **Euclidean norm**, same as math.sqrt(a*a, b*b)
+```
+
+To convert from radians->degrees and degrees->radians respectively use 
+`math.degrees` and `math.radians`
+
+```python
+math.degrees(a)
+# Out: 57.29577951308232
+
+math.radians(57.29577951308232)
+# Out: 1.0
+```
+
+# 9.5 Inplace Operations
+It is common within applications to need to have code like this:
+```python
+a = a + 1
+# or
+a = a * 2
+```
+There is an effective shortcut for these in place operations:
+```python
+a += 1
+a *= 2
+```
+Any mathematic operator can be used before the '=' character to make an inplace
+operation:
+
+| Operators | Descriptions                                 |
+|-----------|----------------------------------------------|
+| -=        | decrement the variable in place              |
+| //=       | floor divide the variable in place # Python3 |
+| **=       | raise to a power in place                    |
+
+# 9.6 Subtraction
+
+# 9.7 Multiplication
+```python
+import operator
+operator.mul(2, 3)  # =6
+```
+Note: The * operator is also used for repeated concatenation of strings, list, 
+and tuples.
+```python
+3 * 'ab'  # = 'ababab'
+3 * ('a', 'b')  # = ('a', 'b', 'a', 'b', 'a', 'b')
+```
+
+# 9.8 Logarithms
+By default, the `math.log` calculates the logaritm of a number, base e. You can
+optionally specify a base as the second argument.
+```python
+import math
+import cmath
+
+math.log(5)         # = ln(5) = 1.6094379124341003
+# optional base argument. Default is math.e
+
+math.log(5, math.e) # = ln(5) = 1.6094379124341003
+cmath.log(5)        # = (1.6094379124341003 + 0j)
+
+math.log(1000, 10)  # = 3.0 (always return float)
+```
+
+Special variations of the `math.log` function exist for different bases.
+```python
+# Logarithm base e - 1(higher precision for low values)
+math.log1p(5)       # = 1.791759469228055
+
+math.log2(8)        # = 3.0
+math.log10(1000)    # = 3.0
+```
+
+# 9.9 Modulus
+```python
+3 % 4   # = 3
+10 % 2  # = 0
+6 % 4   # = 2
+
+# Or by usingi the operator module:
+import operator
+operator.mod(3, 4)  # = 3
+
+# negative numbers (floor divide 向下取整，向负无穷方向取最接近精确值的整数)
+-9 % 7  # = 5
+9 % -7  # = -5
+-9 & -7 # = -2
+
+# If you need to find the result of integer division and modulus, you can use
+the `divmod` function as a shortcut:
+
+quotient, remainder = divmod(9, 4)
+# quotient = 2, remainder = 1
+```
 # Decorators
 - commonly used in frameworks
 
