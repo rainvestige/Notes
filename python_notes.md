@@ -1119,11 +1119,201 @@ operator.mod(3, 4)  # = 3
 -9 & -7 # = -2
 
 # If you need to find the result of integer division and modulus, you can use
-the `divmod` function as a shortcut:
+# the `divmod` function as a shortcut:
 
 quotient, remainder = divmod(9, 4)
 # quotient = 2, remainder = 1
 ```
+
+# Chapter 10: Bitwise Operators
+
+# 10.1 Bitwise Not
+The `~` operator will flip all of the bits in the number. Since computers use
+`signed number representations`--most notably, the `two's complement notation`
+to encode negative binary numbers where negative numbers are written with a 
+leading one(1) instead of a leading zero(0).
+
+In general, though, this mean ~n = -n - 1
+```python
+# 0 = 0b0000 0000
+~0  # Out: -1
+# -1 = 0b1111 1111
+
+# -1 = 0b1000 0001
+~-1  # Out: 0 
+```
+
+#10.2 Bitwise XOR(Exclusive OR)
+The ^ operator will perform a binary XOR in which a binary 1 is copied if and 
+only if it is the value of exactly one operand.
+```python
+# 60 = 0b111100
+# 30 = 0b011110
+60 ^ 30  # Out: 34
+# 34 = 0b100010
+
+bin(60 ^ 30)
+# Out: 0b100010
+```
+
+# 10.3 Bitwise AND
+The & operator will perform a binary AND, where a bit is copied if it exists in
+both operands.
+
+```python
+60 & 30
+# Out: 28
+# 28 = 0b11100
+```
+
+# 10.4 Bitwise OR
+The | operator will perform a binary "or", where a bit is copied if it exists 
+in either operand.
+
+# 10.5 Bitwise Left Shift
+The << operator will perform a bitwise "left shift", where the left operand's
+value is moved left by the number of bits given by the right operand.
+```python
+# 2 = 0b10
+2 << 2
+# Out: 8
+# 8 = 0b1000
+```
+
+# 10.6 Bitwise Right Shift
+The >> operator...
+
+# 10.7 Inplace Operations
+All of the Bitwise operators (except ~) have their own in place versions.
+
+# Chapter 11: Boolean Operators
+
+# 11.1 `and` and `or` are not guaranteed to return a boolean
+
+# 11.2 A simple example
+In python you can compare a single element using two binary operators--one on
+either side
+```python
+if 3.14 < x < 3.142:
+    print('x is near pi')
+```
+In many(most?) programming languages, this would be evaluated in a way contrary
+to regular math: (3.14 < x) < 3.142, but in Python it is treated like 3.14 < x
+and x < 3.142, just like most non-programmers would expect.
+
+# 11.3 Short-circuit evaluation
+Python minimally evaluates Boolean expressions
+```
+>>> def true_func():
+...  print("true_func()")
+...  return True
+...
+>>> def false_func():
+...  print("false_func()")
+...  return False
+...
+>>> true_func() or false_func()
+true_func()
+True
+>>> false_func() or true_func()
+false_func()
+true_func()
+True
+>>> true_func() and false_func()
+true_func()
+false_func()
+False
+```
+
+# 11.4 and
+```
+x = 1
+y = 1
+z = x and y  # z = y, so z = 1, see `and` and `or` are not guaranteed to be boolean
+```
+
+# 11.5 or
+```
+x = 1
+y = 1
+z = x or y  # z = x, so z = 1, see `and` and `or` are not guaranteed to be boolean
+```
+
+# 11.6 not
+
+
+# Chapter 12: Operator Precedence
+Python operators have a set order of precedence, which determines what operators
+are evaluated ﬁrst in a potentially ambiguous expression. For instance, in the 
+expression 3 * 2 + 7, ﬁrst 3 is multiplied by 2, and then the result is added 
+to 7, yielding 13. The expression is not evaluated the other way around, because
+`*` has a higher precedence than `+`.
+
+Below is a list of operators by precedence, and a brief description of what they (usually) do.
+
+# Section 12.1: Simple Operator Precedence Examples in python
+```python
+a, b ,c ,d = 2, 3, 5, 7
+a ** (b + c)  # parentheses = 256
+a * b ** c  # exponent: same as `a * (b ** c)` = 7776
+```
+
+Mathematical rules hold, but not always
+```
+300 / 300 * 200  # = 200.0
+300 * 200 / 300  # = 200.0
+
+1e300 / 1e300 * 1e200  # = 1e+200
+1e300 * 1e200 / 1e300  # = inf
+```
+
+
+# Chapter 13: Variable Scope and Binding
+
+# 13.1 Nonlocal Variables
+Python 3 added a new keyword called `nonlocal`. The nonlocal keyword adds a 
+scope override to the inner scope. This is best illustrated with a couple of 
+code examples. One of the most common examples is to create function that can
+increment:
+```python
+def counter():
+    num = 0
+    def incrementer():
+        num += 1
+        return num
+    return incrementer
+```
+If you try running this code, you will receive an `UnboudLocalError` because
+the `num` variable is referenced before it is assigned in the innermost 
+function. Let's add nonlocal to the mix:
+```python
+def counter():
+    nonlocal num
+    num = 0
+    def incrementer():
+        num += 1
+        return num
+    return incrementer
+
+c = counter()
+c()  # = 1
+c()  # = 2
+c()  # = 3
+```
+Basically `nonlocal` will allow you to assign to variables in an outer scope,
+but not a global scope. So you can't use nonlocal in out counter function
+because then it would try to assign to a global scope. Instead you must use 
+nonlocal in a **nested function**
+
+# 13.2 Global Variables
+In Python, variables inside functions are considered local if and only if
+they appear in the left side of an assignment statement, or some other binding
+occurrence; otherwise such a binding is looked up in enclosing functions, up to
+the global scope. This is true even if the assignment statement is never 
+executed.
+
+# Chapter 14:
+
 # Decorators
 - commonly used in frameworks
 
