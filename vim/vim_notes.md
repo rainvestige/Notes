@@ -72,3 +72,11 @@ make && sudo make install
 # vim user doc
 ## REF: 
 1. [user_doc](http://vimcdoc.sourceforge.net/doc/usr_toc.html#usr_toc.txt)
+
+
+# Configure Plugins
+1. UltiSnips
+
+    [Slove UltiSnips and YouCompleteMe \<tab> mapping collision](
+    https://stackoverflow.com/questions/14896327/ultisnips-and-youcompleteme)
+
