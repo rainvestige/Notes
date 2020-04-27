@@ -4208,7 +4208,105 @@ tuple and not a single value you can use a trailing comma
 ```python
 a = 1 
 a = 1, # a is the tuple (1,)
+
+# A comma is needed also if you use parentheses
+a = (1) # a is the value 1 and not a tuple
+a = (1,) # a is the tuple (1,)
 ```
+
+To unpack value from a tuple and do multiple assignments use
+```python
+x, y, z = (1, 2, 3)
+# x == 1
+# y == 2
+# z == 3
+```
+
+The symbol `_` can be used as a disposable variable name if one only needs some
+elements of a tuple, acting as a placeholder:
+```python
+a = 1, 2, 3, 4
+_, x, y, _ = a
+# x == 2
+# y == 3
+```
+
+Single element tuple:
+```python
+x, = 1, # x is the value 1
+x  = 1, # x is the tuple (1,)
+```
+
+**In Python 3 a target variable with a asterisk * prefix can be used as a 
+`catch-all` variable:**
+```python
+first, *more, last = (1, 2, 3, 4, 5)
+# first = 1
+# more = [2, 3, 4]
+# last = 5
+```
+
+
+# 28.4 Built-in Tuple Functions
+- Comparison
+    If elements are of the same type, python performs the comparison and returns
+    the result. If elements are different types, it checks whether they are 
+    numbers.
+
+    * If numbers, perform comparison.
+    * If either element is a number, then the other element is returned.
+    * Otherwise, types are sorted alphabetically.
+
+    If we reached the end of one of the lists, the longer list is "larger." If
+    both list are same it return 0.
+
+    ```python
+    tuple1 = ('a', 'b', 'c', 'd', 'e')
+    tuple2 = ('1', '2', '3')
+    tuple3 = ('a', 'b', 'c', 'd', 'e')
+
+    cmp(tuple1, tuple2)     # Out: 1
+
+    cmp(tuple2, tuple1)     # Out: -1
+
+    cmp(tuple1, tuple3)     # Out: 0
+    ```
+
+- Tuple Length
+    ```python
+    len(tuple1)     # Out: 5
+    ```
+
+- Max of a tuple
+    ```python
+    max(tuple1)     # Out: 'e'
+
+    max(tuple2)     # Out: '3'
+    ```
+
+- Min of a tuple
+    ```python
+    min(tuple1)     # Out: 'a'
+
+    min(tuple2)     # Out: '1'
+    ```
+
+- Convert a list into tuple
+    ```python
+    list = [1, 2, 3, 4, 5]
+    tuple(list)
+    # Out: (1, 2, 3, 4, 5)
+    ```
+
+- Tuple concatenation
+    ```python
+    tuple1 + tuple2
+    # Out: ('a', 'b', 'c', 'd', 'e', '1', '2', '3')
+    ```
+
+
+# 28.5 Tuple Are Element-wise Hashable and Equatable
+
 # Decorators
 - commonly used in frameworks
 
