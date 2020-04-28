@@ -108,6 +108,7 @@ Plug 'mattn/emmet-vim'
 Plug 'lervag/vimtex'
 " Snippet plugin -- ultisnips
 Plug 'SirVer/ultisnips'
+Plug 'ervandew/supertab'
 
 " List ends here. Plugins become visible to Vim after this call.
 call plug#end()
@@ -149,6 +150,11 @@ let g:ycm_extra_conf_vim_data = [
   \  'g:ycm_python_sys_path'
   \]
 let g:ycm_global_ycm_extra_conf = '~/.vim/plugged/YouCompleteMe/global_extra_conf.py'
+" make YCM compatible with UltiSnips (using supertab)
+let g:ycm_key_list_select_completion = ['<C-n>']
+let g:ycm_key_list_previous_completion = ['<C-p>']
+let g:SuperTabDefaultCompletionType = '<C-n>'
+
 
 "==  
 "== ale error check setting
@@ -245,3 +251,11 @@ let g:vimtex_compiler_latexmk = {
     \   
     \ ],
     \}
+
+
+" ==
+" == UltiSnips
+" ==
+let g:UltiSnipsExpandTrigger = "<tab>"
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
