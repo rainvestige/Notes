@@ -4306,6 +4306,157 @@ first, *more, last = (1, 2, 3, 4, 5)
 
 
 # 28.5 Tuple Are Element-wise Hashable and Equatable
+```python
+hash((1, 2))    # ok
+hash(([], {'hello'}))   # not ok, since lists and sets are not hashable
+
+# Thus a tuple can be putted inside a `set` or as a key in a `dict` only if 
+# each of its elements can.
+{(1, 2)}    # ok
+
+{([], {'hello'})}   # not ok
+```
+
+
+# 28.6 Indexing Tuples
+```python
+x = (1, 2, 3)
+x[0] # 1
+x[2] # 3
+x[3] # IndexError: tuple index out of range
+```
+
+Indexing with negative numbers will start from the last elements as -1:
+```python
+x[-1] # 3
+x[-2] # 2
+x[-3] # 1
+x[-4] # IndexError: tuple index out of range
+```
+
+Indexing a range of elements
+```python
+print(x[:-1])   # (1, 2) similar to x[-3:-1] 左闭右开
+print(x[-1:])   # (3)
+print(x[1:3])   # (2, 3)
+```
+
+
+# 28.7 Reversing Elements
+Reverse elements within a tuple
+```python
+color = ('red', 'green', 'blue')
+rev = colors[::-1]  # step = -1
+# rev: ('blue', 'green', 'red')
+color = rev
+```
+
+Or using reversed(reversed gives an iterable which is converted to a tuple)
+```python
+rev = tuple(reversed(colors))
+# rev: ('blue', 'green', 'red')
+color = rev
+```
+
+
+
+# Chapter 29: Basic Input and Output 
+
+
+# 29.1 Using the print function
+Python 3.x
+
+In Python3, print functionality is in the form of a function:
+```python
+print('This string will be displayed in the output')
+# This string will be displayed in the output
+```
+
+In Python2, print was originally a statement, as shown below.
+```python
+print 'You can print \n escape characters too.'
+# You can print 
+#  escape characters too.
+```
+
+
+# 29.2 Input from a File
+Input can also be read from files. Files can be opened using the built-in
+function open. Using a `with <command> as <name>` syntax(called a context 
+Manager)makes using `open` and getting a handle for the file super easy:
+```python
+with open('somefile.txt', 'r') as fileobj:
+    # write code here using fileobj
+```
+
+This ensures that when code execution leaves the block the file is 
+automatically closed.
+
+Files can be opened in different modes. In the above example, file is opened as
+read-only. To open an existing file for reading only use `r`. If you want to
+read file as bytes use `rb`. To append data to an existing file use `a`. Use 
+`w` to create a file or overwrite any existing files of the same name. You can
+use `r+` to open a file for both reading and writing. The first argument of
+`open()` if the filename, the second is the mode. If mode is left blank, it 
+will default to `r`.
+```python
+# let's create an example file:
+with open('shoppinglist.txt', 'w') as fileobj:
+    fileobj.write('tomato\npasta\ngarlic')
+
+with open('shoppinglist.txt', 'r') as fileobj:
+    # this method makes a list where each line of the 
+    # file is an element in the list.
+    lines = fileobj.readlines()
+    print(lines)
+    # ['tomato\n', 'pasta\n', 'garlic']
+
+
+    # here we read the whole content into one string:
+    content = fileobj.read()
+    # get a list of lines, just like the previous example:
+    lines = content.split('\n')
+    print(lines)
+    # ['tomato', 'pasta', 'garlic']
+```
+
+If the size of the file is tiny, it is safe to read the whole file contents
+into memory, If the file is very large, it is often better to read line-by-line
+or by chunks, and process the input in the same loop. To do that:
+```python
+with open('shoppinglist.txt', 'r') as fileobj:
+    # this method reads line by line:
+    lines = []
+    for line in fileobj:
+        lines.append(line.strip())
+```
+
+When reading files, be aware of the operating system-specific line-break 
+characters. Although `for line in fileobj` automatically strips them off, it is
+always safe to call strip() on the lines read, as it is shown above.
+
+Opened file(fileobj in the above example) always point to a specific location
+in the file. When they are first opened, the file handle points to the very
+beginning of the file, which is the position 0. The file handle can display its
+current position with `tell`:
+```python
+fileobj = open('shoppinglist.txt', 'r')
+pos = fileobj.tell()
+print('We are at {}'.format(pos))
+
+fileobj.close()
+```
+
+To demonstrate the difference between characters and bytes:
+```python
+with open('shoppinglist.txt', 'r') as fileobj:
+    print(type(fileobj.read()))     # <class 'str'>
+
+with open('shoppinglist.txt', 'rb') as fileobj:
+    print(type(fileobj.read()))     # <class 'bytes'>
+```
+
+
 
 # Decorators
 - commonly used in frameworks
