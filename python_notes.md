@@ -4457,7 +4457,129 @@ with open('shoppinglist.txt', 'rb') as fileobj:
 ```
 
 
+# 29.3 Read from stdin
+Python programs can read from `unix pipelines`. Here is a simple example how to
+read from `stdin`:
+```python
+import sys
+for line in sys.stdin:
+    print(line)
+```
 
+Be aware that sys.stdin is a stream. It means that the for-loop will only 
+terminate when the stream has ended.
+
+You can now pipe the output of another program into your python programs as
+follows:
+```bash
+cat myfile | python myprogram.py
+```
+In this example `cat myfile` can be any unix command that outputs to stdout.
+
+Alternatively, using the `fileinput module` can come in handy:
+```python
+import fileinput
+for line in fileinput.input():
+    process(line)
+```
+
+
+# 29.4 Using input() and raw_input()
+Python2.x Version >= 2.3
+
+raw_input will wait for the user to enter text and then return the result as 
+a string.
+```python
+foo = raw_input("Put a message here that asks the user for input")
+```
+
+Python3.x
+`input` will wait for the user to enter text and then return the result as a
+string.
+```python
+foo = input("Put a message here that asks the user for input")
+```
+
+In the above examples foo will store whatever input the user provides.
+
+
+# 29.5 Function to prompt user for a number
+```python
+def input_number(msg, err_msg=None):
+    while True:
+        try:
+            return float(input(msg))
+        except ValueError:
+            if err_msg is not None:
+                print(err_msg)
+
+user_number = input_number('input a number:', 'that's not a number')
+```
+
+
+# 29.6 Printing a string without a newline at the end
+Python3.x
+The `print` function has an optional end parameter that is what it prints at 
+the end of the given string. By default, it's a newline character, so 
+equivalent to this:
+```python
+print('Hello, ', end='\n')
+print('World!')
+# Hello, 
+# World!
+```
+
+But you could pass in other strings
+```python
+print('Hello, ', end='')
+print('World!')
+# Hello, World!
+
+print('Hello, ', end='<br>')
+print('World!')
+# Hello, <br>World!
+``` 
+
+If you want more control over the output, you can use sys.stdout.write:
+```python
+import sys
+
+sys.stdout.write('Hello, ')
+sys.stdout.write('World!')
+# Hello, World!
+```
+
+
+
+# Chapter 30: Files & Folders I/O
+
+# 30.1 File modes
+There are different modes you can open a file with, specified by the `mode`
+parameter.
+|      | read | write | append | exclusive |
+|------|------|-------|--------|-----------|
+| mode | r    | w     | a      | x         |
+|      | r+   | w+    | a+     | x+        |
+|      | rb   | wb    | ab     | xb        |
+|      | rb+  | wb+   | ab+    | xb+       |
+|------|------|-------|--------|-----------|
+
+Python3 added a new mode for exclusive creation so that you will not 
+accidentally truncate or overwrite an existing file.
+    - 'x': open for exclusive creation, will raise FileExistsError if the file
+           already exists
+
+Allow one to write your file oepn code in a more pythonic manner:
+```python
+try:
+    with open('filename', 'r') as fout:
+        # work with your opened file
+    except FileExistsError:
+        # You error handling goes here
+```
+
+
+# 30.2 Reading a file line-by-line
 # Decorators
 - commonly used in frameworks
 
