@@ -4580,6 +4580,309 @@ try:
 
 
 # 30.2 Reading a file line-by-line
+The simplest way to iterate over a file line-by-line:
+```python
+with open('filename.txt', 'r') as fp:
+    for line in fp:
+        print(line)
+```
+
+`readline()` allows for more granular control over line-by-line iteration.
+```python
+with open('filename.txt', 'r') as fp:
+    while True:
+        cur_line = fp.readline()
+        # if the result is an empty string
+        if cur_line == '':
+            # We have reached the end of the file
+            break
+        print(cur_line)
+```
+
+Using the for loop iterator and the readline() together is considered bad 
+practice.
+
+More commonly, the `readlines()` method is used to store an iterable collection
+of the file's lines:
+```python
+with open('filename.txt', 'r') as fp:
+    lines = fp.readlines()
+    for i, line in enumerate(lines):
+        print('Line {}: {}'.format(i, line))
+```
+
+
+# 30.3 Iterate files (recursively)
+To iterate all files, including in sub directors, use `os.walk`:
+```python
+import os
+for root, folders, files in os.walk(root_dir):
+    for filename in files:
+        print(root, filename)
+```
+root_dir can be '.' to start from current directory, or any other path to start 
+from.
+
+If you also wish to get information about the file, you may use the more 
+efficient method `os.scandir` like so:
+```python
+for entry in os.scandir(path):
+    if not entry.name.startswith('.') and entry.is_file():
+        print(entry.name)
+```
+
+
+# 30.4 Getting the full contents of a file
+The perferred method of file i/o is to use the `with` keyword. This will ensure
+the file handle is closed once the reading or writing has been completed.
+```python
+with open('myfile.tx.') as fp:
+    content = fp.read()
+
+    print(content)
+```
+or, to handle closing the file manually, you can forgo `with` and simply call 
+close yourself:
+
+Keep in mind that without using a with statement, you might accidentally keep
+the file open in case an unexcepted exception arises like so:
+```python
+fp = open('my_file.txt', 'r')
+raise Exception('oops')
+fp.close() # This will never be called
+```
+
+
+# 30.5 Writing to a
+```python
+with open('myfile.txt', 'w') as f:
+    f.write('Line 1')
+    f.write('Line 2')
+    f.write('Line 3')
+    f.write('Line 4')
+```
+
+If you open my_file.txt, you will see that its contents are:
+> Line 1Line 2Line 3Line 4
+
+Python doesn't automatically add line breaks, you need to do that manually:
+```python
+with open('myfile.txt', 'w') as f:
+    f.write('Line 1\n')
+    f.write('Line 2\n')
+    f.write('Line 3\n')
+    f.write('Line 4\n')
+```
+
+Do not use `os.linesep` as a line terminator when writing files opened in text
+mode(the default); use \n instead.
+
+If you want to specify an encoding, you simply add the encoding parameter to 
+the `open` function:
+```python
+with open('my_file.txt', 'w', encoding='utf-8') as f:
+    f.write('utf-8 text')
+```
+
+It is also possible to use the print statement to write to a file. The 
+mechanics are different in Python2 vs Python3, but the concept is the same in
+that you can take the output that would have gone to the screen and send it to
+a file instead.
+```python
+# Python3.x
+with open('fred.txt', 'w') as outfile:
+    s = "I'm Not Dead Yet!"
+    print(s)    # write to stdout
+    print(s, file=outfile)  # write to outfile
+
+
+    # Note: it is possible to specify the file parameter AND write to the 
+    # screen by making sure file ends up with a None value either directly or
+    # via a variable
+    myfile = None
+    print(s, file=myfile)   # writes to stdout
+    print(s, file=None)   # writes to stdout
+```
+
+
+# 30.6 Check whether a file or path
+```python
+import errno
+
+try:
+    with open(path) as f:
+        # File exists
+except IOError as e:
+    # Raise the exception if it is not ENOENT(No such file or directory)
+    if e.errno != errno.ENOENT:
+        raise
+    # No such file or directory
+```
+
+This will also avoid race-conditions if another process deleted the file 
+between the check and when it is used. This race condition could happen in the
+following cases:
+```python
+# Using the os module
+import os
+os.path.isfile('/path/to/some/file.txt')
+
+
+# Using pathlib
+path = pathlib.Path('/path/to/some/file.txt')
+if path.is_file():
+    pass
+
+
+To check whether a given path exists or not, you can follow the above EAFP
+procedure, or explicitly check the path:
+import os\
+path = '/home/myFiles/directory/'
+
+if os.path.exists(path):
+    pass
+```
+
+
+# 30.7 Random File Access Using mmap
+Using the `mmap` module alllows the user to randomly access locations in a file
+by mapping the file into memory. This is an alternative to using normal file
+operators.
+```python
+with open('filename.ext', 'r') as fd:
+    # 0: map the whole file
+    mm = mmap.mmap(fd.fileno(), 0)
+
+    # print characters at indices 5 through 10
+    print(mm[5:10])
+
+    # print the line starting from mm's current position
+    print(mm.readline())
+
+    # write a character to the 5th index
+    mm[5] = 'a'
+
+    # return mm's position to the beginning of the file
+    mm.seek(0)
+
+    # close the mmap object
+    mm.close()
+```
+
+
+# 30.8 Repalcing text in a file
+```python
+import fileinput
+
+replacements = {'Search1': 'Replace1',
+                'Search2': 'Replace2'}
+
+for line in fileinput.input('filename.txt', inplace=True):
+    for search_for in replacements:
+        replace_with = replacements[search_for]
+        line = line.replace(search_for, replace_with)
+    print(line, end='')
+```
+
+
+# 30.9 Checking if a file is empty
+```
+import os
+os.stat(path_to_file).st_size == 0
+```
+or
+```
+import os
+os.path.getsize(path_to_file) > 0
+```
+
+However, both will throw an exception if the file does not exist. To avoid 
+having to catch such an error, do this:
+```python
+import os
+def is_empty_file(fpath):
+    return os.path.isfile(fpath) and os.path.getsize(fpath) > 0
+```
+
+
+# 30.10 Read a file between a range of lines
+So let's suppose you want to iterate only between some specific lines of a file
+You can make use of itertools for what
+```python
+import itertools
+with open('filename.txt', 'r') as f:
+    for line in itertools.islice(f, 12, 20):
+        # do something here
+```
+
+This will read through the line 13 to 20 as in python indexing starts from 0.
+So line number 1 is indexed as 0.
+
+As can also read some extra lines by making use of the next() keyword here.
+
+And when you are using the file object as an iterable, please don't use 
+readline() statement here as the two techniques of traversing a file are not to
+be mixed together.
+
+
+# 30.11 Copy a directory tree
+```python
+import shutil
+
+source = '//192.168.1.2/Daily Reports'
+destination = 'D:\\Reports\\Today'
+shutil.copytree(source, destination)
+```
+The destination directory must **not exist already**
+
+
+# 30.12 Copying contents of one file to a different file
+```python
+with open(input_file, 'r') as in_file, open(output_file, 'w') as out_file:
+    for line in in_file:
+        out_file.write(line)
+
+# Using the `shutil` module:
+import shutil
+
+shutil.copyfile(src, dst)
+```
+
+
+
+# Chapter 31: os.path
+This module implements some useful functions on pathname. The path Parameters
+can be passed as either strings, or bytes. Application are encouraged to 
+represent file names as (Unicode) character strings.
+
+
+# 31.1 Join Paths
+To join two or more path components together, firstly import os module of 
+python and then use following:
+```python
+import os
+
+os.path.join('a', 'b', 'c')
+```
+The advantages of using os.path is that it allows code to remain **compatible
+over all operating systems**, as this uses the separator appropriate for the
+platform it's running on.
+
+For example, the result of this command on Windows will be:
+```
+>>> os.path.join('a', 'b', 'c')
+'a\b\c'
+```
+In an Unix OS:
+```
+>>> os.path.join('a', 'b', 'c')
+'a/b/c'
+```
+
+
+# 31.2 Path Component Manipulation
+
+
 # Decorators
 - commonly used in frameworks
 
