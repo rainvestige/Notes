@@ -4881,6 +4881,186 @@ In an Unix OS:
 
 
 # 31.2 Path Component Manipulation
+To split one component off of the path:
+```python
+p = os.path.join(os.getcwd(), 'foo.txt')
+# getcwd() get current working directroy?
+# p: '/Users/csaftoiu/tmp/foo.txt'
+
+os.path.dirname(p)
+# '/Users/csaftoiu/tmp/'
+
+os.path.basename(p)
+# 'foo.txt'
+
+os.path.split(os.getcwd())
+# ('/Users/csaftoiu/tmp/', 'foo.txt')
+
+os.path.splitext(os.path.basename(p))
+# ('foo', '.txt')
+```
+
+
+# 31.3 Get the parent directory
+```python
+os.path.abspath(os.path.join(PATH_TO_GET_THE_PARENT, os.pardir))
+```
+
+
+# 31.4 If the given path exists
+```python
+path = 'path/to/file'
+os.path.exists(path)
+# this returns false if path doesn't exist or if the path is a broken symbolic
+# link
+```
+
+
+# 31.5 Check if the given path is a directory, file, symbolic link, mount point etc
+```python
+dirname = '/home/john/python'
+os.path.isdir(dirname)
+
+filename = dirname + 'main.py'
+os.path.isfile(filename)
+
+# to check if the given path is symbolic link
+symlink = dirname + 'some_sym_link'
+os.path.islink(symlink)
+
+# to check if the given path is a `mount point`
+mount_path = '/home'
+os.path.ismount(mount_path)
+```
+
+
+# 31.6 Absolute Path from Relative Path
+```
+>>> os.getcwd()
+'/Users/csaftoiu/tmp/'
+
+>>> os.path.abspath('foo')
+'/Users/csaftoiu/tmp/foo'
+
+>>> os.path.abspath('../foo')
+'/Users/csaftoiu/foo'
+
+>>> os.path.abspath('/foo')
+'/foo'
+
+```
+
+
+
+# Chapter 32: Iterables and Iterators
+
+# 32.1 Iterator vs Iterable vs Generator
+An __iterable__ is an object that can return an __iterator__. Any object with 
+state that has an `__iter__` method and returns an iterator is an iterable. It
+may also be an object without state that implements a `__getitem__` method. The
+method can take indices(starting from zero) and raise an IndexError when the 
+indices are no longer valid.
+
+Python's str class is an example of a `__getitem__` iterable.
+
+An __iterator__ is an object that produces the next value in a sequence when 
+you call next(*object*) on some object. Moreover, any object with a `__next__`
+method is an iterator. An iterator raises `StopIteration` after exhausting the
+iterator and cannot be re-used at this point.
+
+
+__iterable classes:__
+
+iterable classes define an `__iter__` and a `__next__` method. Example of an 
+iterable class:
+```python
+class MyIterable:
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        # code
+```
+
+
+Trying to instantiate the abstract class from the `collections` module to 
+better see this.
+
+```python
+import collections
+collections.Iterator()
+# Python2.x
+# TypeError: cant instantiate abstract class Iterator with abstract methods next
+
+# Python3.x
+# TypeError: cant instantiate abstract class Iterator with abstract methods __next__
+```
+
+Handle Python 3 compatibility for iterable classes in Python 2 by doing the 
+following:
+```python
+class MyIterable(collections.Iterator): 
+    
+    def __iter__(self):
+        return self
+
+    def next(self): # code
+
+    __next__ = next
+```
+
+
+Both of these are now iterators and can be looped through:
+```python
+ex1 = MyIterableClass()
+ex2 = MySequence()
+
+for (item) in (ex1): # code
+for (item) in (ex2): # code
+```
+
+Generators are simple ways to create iterators. A generator is an iterator and 
+an iterator is an iterable.
+
+
+# 32.2 Extract values one by one
+Start with `iter()` built-in to get __iterator__ over iterable and use next() 
+to get elements one by one until `StopIteration` is raised signifying the end:
+```python
+s = {1, 2}  # or list or generator or even iterator
+i = iter(s) # get iterator
+a = next(i) # a = 1
+b = next(i) # b = 2
+c = next(i) # raises StopIteration
+```
+
+
+# 32.3 Iterating over entire iterable
+```python
+s = {1, 2, 3}
+
+# getevery element in s
+for a in s:
+    print(a)
+
+# copy into list
+l1 = list(s)
+```
+
+
+# 32.4 Verify only one element in iterable
+Use unpacking to extract the first element and ensure it's the only one:
+```python
+a, = iterable
+
+def foo():
+    yield 1
+
+a, = foo()  # a = 1
+
+nums = [1, 2, 3]
+a, = nums   # ValueError: too many values to unpack
+```
 
 
 # Decorators
