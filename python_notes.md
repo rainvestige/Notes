@@ -5063,6 +5063,213 @@ a, = nums   # ValueError: too many values to unpack
 ```
 
 
+# 32.5 What can be iterable
+__Iterable__ can be anything for which items are received one by one, forward
+only. Built-in Python collections are iterable.
+```python
+[1, 2, 3]
+(1, 2, 3)
+{1, 2, 3}
+{1:2, 3:4}
+```
+
+Generators return iterables:
+```python
+def foo():  # foo isn't iterable yet ...
+    yield 1
+
+res = foo()     # ... but res already is
+```
+
+
+# 32.6 Iterator isn't reentrant!
+```python
+def gen():
+    yield 1
+
+iterable = gen()
+for a in iterable:
+    print(a)
+
+# What was the first item of iterable? No way to get it now.
+# Only to get a new iterator
+gen()
+```
+
+
+
+# Chapter 33: Functions
+| Parameter     | Details                       |
+|---------------|-------------------------------|
+| arg1,...,argN | Regular arguments             |
+| *args         | Unnamed positional arguments  |
+| kw1, ..., kwN | Keyword-only arguments        |
+| **kwargs      | The rest of keyword arguments |
+|---------------|-------------------------------|
+
+Functions in Python provide organized, reusable and modular code to perform a
+set of specific actions. Functions simplify the coding process, prevent 
+redundant logic, and make the code easier to follow.
+
+Python has many built-in functions like `print(), input(), len()`. Besides
+built-ins you can also create your own functions to do more specific jobs--
+these are called user-defined functions.
+
+
+# 33.1 Defining and calling simple functions
+Using the `def` statement is the most common way to define a function in python
+. This statement is a so called single clause compound statement with the 
+following syntax:
+```python
+def function_name(parameters):
+    statement(s)
+```
+
+_function_name_ is known as the _identifier_ of the function. Since a function
+definition is an executable statement its execution _binds_ the function name
+to the function object which can be called later on using the identifier.
+
+`parameter` is an optional list of identifier that get bound to values supplied
+as arguments when the function is called. A function may have an arbitrary
+number of arguments which are separated by commas.
+
+`statement(s)` -- also known as the function body -- are a nonempty sequence of
+statements executed each time the function is called. This means a function
+body cannot be empty, just like any `idented block`.
+
+Here's an example of a simple function definition which purpose is to print 
+`Hello` each time it's called:
+```python
+def greet():
+    print('Hello')
+
+# call greet
+greet()
+# Out: Hello
+```
+
+You'll notice that unlike many other languages, you do not need to explicitly
+declare a return type of the function. Python functions can return values of
+any type via the `return` keyword. One function can return any number of 
+different types!
+```python
+def many_types(x):
+    if x < 0:
+        return 'Hello'
+    else:
+        return 0
+```
+
+As long as this is handled correctly by the caller, this is perfectly valid
+Python code.
+
+A function that reaches the end of executin without a return statement will
+always return `None`
+```python
+def do_nothing():
+    pass
+
+print(do_nothing())
+# Out: None
+```
+
+As mentioned previously a function definition must have a function body, a
+nonempty sequence of statements. Therefore the `pass` statement is used as
+function body, which is a null operation - when it is executed, nothing happens.
+It does what it means, it skips. It is useful as a placeholder when a statement
+is required syntactically, but no code needs to be executed.
+
+
+# 33.2 Defining a function with an arbitrary number of arguments
+**Arbitrary number of positional arguments:**
+
+Defining a function capable of taking an arbitrary number of arguments can be
+done by prefixing one of the arguments with a asterisk*.
+```python
+
+def func(*args):
+    # args will be a tuple containing all values that are passed in
+    for i in args:
+        print(i)
+    
+# Calling it with 3 arguments
+func(1, 2, 3)
+
+# Out: 1
+#      2
+#      3
+
+list_of_arg_values = [1, 2, 3]
+# Calling it with list of values, * expends the list
+func(*list_of_arg_values)
+# Out: 1
+#      2
+#      3
+
+# Calling it without arguments
+func()
+# no output
+```
+
+You can't provide a default for args, for example `func(*args=[1, 2, 3])` will
+raise a syntax error(won't even complie)
+
+You can't provide these by name when calling the function, for example 
+`func(*args=[1, 2, 3])` will raise a `TypeError`.
+
+But if you already have your arguments in an array(or any other Iterable), you
+can invoke you function like this:`func(*my_stuff)`.
+
+These arguments(*args) can be accessed by index, for example args[0] will 
+return the first argument.
+
+**Arbitrary number of keyword arguments**
+You can take an arbitrary number of arguments with a name by defining an 
+argument in the definition with two * in front of it:
+```python
+def func(**kwargs):
+    # kwargs will be a dictionary containing the names as keys and the values
+    # as values
+    for name, value in kwargs.items():
+        print(name, value)
+
+func(value1=1, value2=2, value3=3) # Calling it with 3 arguments
+# Out: value1 1
+#      value2 2
+#      value3 3
+
+func()      # Calling it without arguments
+
+my_dict = {'foo': 1, 'bar': 2}
+func(**my_dict)     # Calling it with a dictionary
+# Out: foo 1
+#      bar 2
+```
+
+You **can't** provide these without names, for example `func(1, 2, 3)` will
+raise a `TypeError`.
+
+`kwargs` is a plain native python dictionary. For example, args['value1'] will
+give the value for argument value1. Be sure to check beforehand that there is
+such an argument or a `KeyError` will be raised.
+
+**Warning**
+
+You can mix these with other optional and required arguments but the order 
+inside the definition matters.
+
+1. The **positional/keyword** arguments come first.(Required arguments).
+2. Then comes the **arbitrary** `*arg` arguments.(Optional)
+3. Then **keyword-only** arguments come next.(Required)
+4. Finally the **arbitrary keyword** `**kwargs` come.(Optional)
+
+```python
+#       |-positional-|optional|--keyword-only--|optional|
+def func(arg1, arg2=10, *args, kwarg1, kwarg2=2, **kwargs):
+    pass
+```
+
+
 # Decorators
 - commonly used in frameworks
 
