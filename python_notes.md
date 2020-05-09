@@ -5261,14 +5261,100 @@ inside the definition matters.
 1. The **positional/keyword** arguments come first.(Required arguments).
 2. Then comes the **arbitrary** `*arg` arguments.(Optional)
 3. Then **keyword-only** arguments come next.(Required)
-4. Finally the **arbitrary keyword** `**kwargs` come.(Optional)
+4. Finally the **arbitrary keyword** `\*\*kwargs` come.(Optional)
 
 ```python
 #       |-positional-|optional|--keyword-only--|optional|
 def func(arg1, arg2=10, *args, kwarg1, kwarg2=2, **kwargs):
     pass
 ```
+- arg1 must be given, otherwise a `TypeError` is raised. It can be given as
+    positional(func(10)) or keyword argument(func(arg1=10)).
+- kwarg1 must also be given, but it can only be provided as keyword-argument:
+    func(kwarg1=10).
+- arg2 and kwarg2 are optional. If the value is to be changed the same rules as
+    for arg1(either positional or keyword) and kwarg1(only keyword) apply.
+- **args catches additional positional parameters. But note, that arg1 and arg2
+    must be provided as positional arguments to pass arguments to *args:
+    func(1, 1, 1, 1) (the second is 1 not arg2=1)
+- **kwargs catches all additional keyword parameters. In this case any parameter 
+    that is not arg1, arg2, kwarg1 or kwarg2. For example: func(kwarg3=10).
+- In Python3, you can use * alone to indicate that all subsequent arguments must
+    be specified as keywords. For instance, `def math.isclose(a, b, *, 
+    rel_tol=1e-09, abs_tol=0.0), which means the first two arguments can be 
+    supplied positionally but the optional third and fourth parameters can only
+    be supplied as keyword arguments.
 
+__Note on Uniqueness__
+
+Any function can be defined with none or one `*args` and none or one `**kwargs`
+but not with more than one of each.
+
+**Note on Nesting Functions with Optional Arguments**
+It is possible to nest such functions and the usual convention is to remove
+the items that the code has already handled but if you are passing down the
+parameters you need to pass optional positional args with a `*prefix` and
+optional keyword args with a `**prefix`, otherwise args will be passed as a
+list or tuple and kwargs as a single dictionary.
+```python
+def fn(**kwargs):
+    print(kwargs)
+    f1(**kwargs)
+
+def f1(**kwargs):
+    print(len(kwargs))
+
+fn(a=1, b=2)
+# Out:
+# {'a': 1, 'b': 2}
+# 2
+```
+
+
+# 33.3 Lambda(Inline/Anonymous) Functions
+The `lambda` keyword creates an inline function that contains a single 
+expression. The value of this expression is what the function returns when
+invoked.
+
+```python
+greet_me = lambda: 'hello'
+```
+This creates an inline function with the name greet_me that returns Hello. Note
+that you don't write `return` when creating a function with lambda. The value
+after `:` is automatically returned.
+
+Once assigned to a variable, it can be used just like a regular function:
+```python
+print(greet_me())
+# Out: hello
+```
+
+`lambdas` can take arguments, too:
+```python
+strip_and_upper_case = lambda s: s.strip().upper()
+strip_and_upper_case("   Hello   ")
+# Out: HELLO
+```
+
+They can also take arbitrary number of arguments/keyword arguments, like normal
+functions.
+```python
+greeting = lambda x, *args, **kwargs: print(x, args, kwargs)
+greeting('hello', 'world', world='world')
+# Out: hello ('world',) {'world': 'world'}
+```
+
+
+`lambda` are commonly used for short functions that are convenient to define at
+the point where they are called(typically with sorted, filter, map).
+
+For example, this line sorts a list of strings ignoring their case and ignoring
+whitespace at the beginning and at the end:
+```python
+sorted([' foo ', '    bAR', 'BaZ    '], key=lambda s: s.strip().upper())
+# Out:
+# ['    bAR', 'BaZ    ', ' foo ']
+```
 
 # Decorators
 - commonly used in frameworks
