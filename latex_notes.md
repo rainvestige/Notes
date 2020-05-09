@@ -20,6 +20,12 @@
 ## INSTALL texlive
 1. [quick install](http://tug.org/texlive/quickinstall.html)
     >I choose to use texlive*.iso 
+    ```bash
+    sudo mkdir /media/iso
+    sudo mount texlive*.iso /media/iso/
+    cd /media/iso/
+    sudo perl install-tl
+    ```
 
 ## INSTALL LATEXMK
 1. download [latexmk](http://personal.psu.edu/jcc8//software/latexmk-jcc/latexmk-467.zip)
