@@ -1,3 +1,9 @@
+# Install and Configure
+user configure file ~/.gitconfig
+
+
+
+
 # Generating a new SSH key and adding it to the ssh-agent
 ## ENV: Linux + ssh + git
 This part is aim to associate our local repositories to remote github
@@ -30,7 +36,19 @@ This part should be done in the github setting
 
 ### 4.Check 
 ```bash
-$ ssh git@github.com
+ssh git@github.com
+ssh: connect to host github.com port 22: Connection timed out
+```
+
+To solve the port 22 timed out problem, edit the file at ~/.ssh/config, add the
+content below:
+```
+Host github.com
+User xinyuloveslife@163.com
+Hostname ssh.github.com
+PreferredAuthentications publickey
+IdentityFile ~/.ssh/id_rsa
+Port 443
 ```
 
 #
