@@ -13,6 +13,7 @@ git clone https://github.com/vim/vim.git
 
 3. Configure the vim
 
+You should change the python-config-dir according to your environment
 ```bash
 cd vim/
 ./configure --with-features=huge \
@@ -61,6 +62,10 @@ make && sudo make install
 
     Both [vim-plug](https://github.com/junegunn/vim-plug) and 
     [vundle](https://github.com/VundleVim/Vundle.vim) is ok.
+
+    When you install the vim-plug, you may meet the connection refused problem.
+    To solve the problem, change the `/etc/hosts`, add the pair
+    (ip_address hostname)
 
 2. Configure your .vimrc file in __$HOME__ directory to download plugins.
 
