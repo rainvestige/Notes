@@ -57,7 +57,7 @@ map tl :+tabnext<CR>
 "------------------------------------------------------------"
 
 " N key: go to the start of the line
-noremap <C-h> 0
+noremap <C-h> ^
 " I key: go to the end of the line
 noremap <C-l> $
 "------------------------------------------------------------"
@@ -251,6 +251,13 @@ let g:vimtex_compiler_latexmk = {
     \   
     \ ],
     \}
+let g:vimtex_quickfix_latexlog = {
+    \ 'overfull' : 0,
+    \ 'underfull' : 0,
+    \ 'packages' : {
+    \   'default' : 0,
+    \ },
+    \}
 
 
 " ==
@@ -258,4 +265,5 @@ let g:vimtex_compiler_latexmk = {
 " ==
 let g:UltiSnipsExpandTrigger = "<tab>"
 let g:UltiSnipsJumpForwardTrigger = "<tab>"
-let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<C-k>"
+let g:UltiSnipsEditSplit = 'context'
