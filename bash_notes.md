@@ -99,3 +99,15 @@ can be put in a script file for reuse
     - sh script_name.sh
 
     
+# Mount Command
+1. List information about block device
+   ```bash
+   lsblk -o name,size,uuid,fstype
+   ``` 
+
+2. Modify the /etc/fstab file, add the content below at the end of the file
+    ```
+    # /media/windows/ was on /dev/sda2 during installation
+    UUID=CCBA2722BA270912                     /media/windows       ntfs    uid=1000,gid=1000,fmask=007,dmask=007   0       0
+    ```
+    You only need to change the UUID and `/media/windows`
