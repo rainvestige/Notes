@@ -5356,6 +5356,166 @@ sorted([' foo ', '    bAR', 'BaZ    '], key=lambda s: s.strip().upper())
 # ['    bAR', 'BaZ    ', ' foo ']
 ```
 
+Sort list just ignoring whitespaces:
+```python
+sorted([' foo ', '    bAR', 'BaZ    '], key=lambda s: s.strip())
+# Out:
+# ['BaZ    ', '    bAR', ' foo ']
+```
+
+Examples with `map`:
+```python
+sorted(map(lambda s: s.strip().upper(), [' foo ', '    bAR', 'BaZ    ']))
+# Out: 
+# ['BAR', 'BAZ', 'FOO']
+
+
+sorted(map(lambda s: s.strip(), [' foo ', '    bAR', 'BaZ    ']))
+# Out: 
+# ['Baz', 'bAR', 'foo']
+```
+
+Examples with numerical lists:
+```python
+my_list = [3, -4, -2, 5, 1, 7]
+sorted(my_list, key=lambda x: abs(x))
+# Out:
+# [1, -2, 3, -4, 5, 7]
+
+list(filter(lambda x: x > 0, my_list))
+# Out:
+# [3, 5, 1, 7]
+
+list(map(lambda x: abs(x), my_list))
+# Out:
+# [3, 4, 2, 5, 1, 7]
+```
+
+One can call other functions(with/without arguments) from inside a lambda 
+function.
+```python
+def foo(msg):
+    print(msg)
+
+greet = lambda x = 'hello world': foo(x)
+greet()
+# hello world
+```
+This is useful because `lambda` may contain only one expression and by using a 
+subsidiary function one can run multiple statements.
+
+
+# 33.4 Defining a function with optional arguments
+Optional arguments can be defined by assigning(using =) a default value to the
+argument-name:
+```python
+def make(action='nothing'):
+    return action
+```
+
+Calling this function is possible in 3 different ways:
+```python
+make('fun')
+
+make(action='sleep')
+
+make()
+```
+
+__Warning__
+
+Mutable types(list, dict, set, etc) should be treated with care when given as 
+default attribute. Any mutation of the default argument will change it 
+permanently.
+
+
+# 33.5 Defining a function with optional mutable arguments
+
+## Explanation
+This problem arises because a function's default arguments are initialised once,
+at the point when the function is defined, and not(like many other language) 
+when the function is called. The default values are stored inside the function
+object's `__defaults__` member variable.
+```python
+def f(a, b=42, c=[]):
+    pass
+
+print(f.__defaults__)
+# Out: (42, [])
+```
+
+For __immutable__ types, this is not a problem because there is no way to mutate
+the variable. However, for a __mutable__ type, the original value can mutate, by
+call to its various member functions.
+```python
+def append(elem, to=[]):
+    to.append(elem)
+    # This call to append() mutates the default variable "to"
+    return to
+
+append(1)
+# Out: [1]
+append(2) # Appends it to the internally stored list
+# Out: [1, 2]
+append(3, [])
+# Out: [3]
+# Using a new created list gives the expected result
+# Calling it again without argument will append to the internally stored list again
+append(4)
+# Out: [1, 2, 4]
+```
+
+## Solution
+If you want to ensure that the default argument is always the one you specify
+in the function definition, then the solution is to always use an immutable
+type as your default argument.
+
+A common idiom to achieve this when a mutable type is needed as the default, is
+to use None(immutable) as the default argument and then assign the actual 
+default value to the argument variable if it is equal to None.
+```python
+def append(elem, to=None):
+    if to is None:
+        to = []
+    to.append(item)
+    return to
+```
+
+
+# 33.6 Argument passing and mutability
+First, some terminology:
+ - argument(actual parameter): the actual variable being passed to a function;
+ - parameter(formal parameter): the receiving variable that is used in a function.
+
+**In Python, arguments are passed by assignment**(as opposed to other languages,
+where arguments can be passed by value/reference/pointer).
+ - Mutating a parameter will mutate the argument(if mutable)
+ ```python
+ def foo(x):
+     x[0] = 9
+     print(x)
+ 
+ y = [4, 5, 6]
+ foo(y)
+ # Out: [9, 5, 6]
+ print(y)
+ # Out: [9, 5, 6]
+ ```
+ - Reassigning the parameter won’t reassign the argument.
+ ```python
+ def foo(x):
+    x[0] = 9
+    x = [1, 2, 3]
+    x[2] = 8
+
+ y = [4, 5, 6]
+ foo(y)
+ y
+ # Out: [9, 5, 6]
+ ```
+
+
+
 # Decorators
 - commonly used in frameworks
 
