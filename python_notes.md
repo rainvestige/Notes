@@ -5514,6 +5514,173 @@ where arguments can be passed by value/reference/pointer).
  # Out: [9, 5, 6]
  ```
 
+In Python, we don't really assign values to variables, instead we bind
+(i.e. assign, attach) variables(considered as names) to objects.
+- Immutable: integers, strings, tuples, and so on. All operations make copies
+- Mutable: Lists, dictionaries, sets, and so on. Operations may or may not mutate.
+```python
+x = [3, 1, 9]
+y = x
+x.append(5)  # Mutates the list labeled by x and y, both x and y are bound to [3, 1, 9, 5]
+x.sort()     # Mutates the list labelled by x and y(in-place sorting)
+x = x + [4]  # Does not mutate the list(make a copy for x only, not y)
+z = x        # z is x ([1, 3, 5, 9, 4])
+x += [6]     # Mutates the list labelled by both x and z(uses the extend function).
+x = sorted(x)# Does not mutate the list(make a copy for x only)
+x
+# Out: [1, 3, 4, 5, 6, 9]
+y
+# Out: [1, 3, 5, 9]
+z
+# Out: [1, 3, 5, 9, 4, 6]
+```
+
+
+# 33.7 Returning values from functions
+Functions can `return` a value that you can use directly:
+```python
+def give_me_five()
+    return 5
+
+print(give_me_five())
+
+# or save the value for later use
+num = give_me_five()
+print(num)
+
+# or use the value for any operations
+print(give_me_five() + 10)
+```
+
+If `return` is encountered in the function the function will be exited 
+immediately and subsequent operations will not be evaluated:
+
+You can also `return` multiple values(in the form of a tuple)
+```python
+def give_me_fives():
+    return 5, 5
+
+first, second = give_me_fives()
+print(first)
+print(second)
+```
+
+A function with no return statement implicitly retunr None. Similarly a function
+with a `return` statement, but no return value or variable return None.
+
+
+# 33.8 Closure
+Closures in Python are created by function calls. Here, the call to `makeInc`
+creates a binding for x that is referenced inside the function `inc`. Each call
+to `makeInc` creates a new instance of this function, but each instance has a
+link to a different binding ofx.
+```python
+def makeInc(x):
+    def inc(y):
+        # x is "attached" in the definition of inc
+        return y + x
+    return inc
+
+incOne = makeInc(1)
+incFive = makeInc(5)
+
+incOne(5) # returns 6
+incFive(5) # return 10
+```
+
+Notice that while in a regular closure the enclosed function fully inherits all
+variables from its enclosing environment, in this construct the enclosed 
+function has only read access to the inheritd variables **but cannot make 
+assignments to them**
+```python
+def makeInc(x):
+    def inc(y):
+        # incrementing x is not allowed
+        x += y
+        return x
+    return inc
+
+incOne = makeInc(1)
+
+incOne(5) # UnboundLocalError: local variable 'x' referenced before assignment
+```
+
+Python 3 offers the `nonlocal` statement for realizing a full closure with 
+nested functions.
+```python
+def makeInc(x):
+    def inc(y):
+        nonlocal x
+        # now assigning a value to x is allowed
+        x += y
+        return x
+    return inc
+
+incOne = makeInc(1)
+
+incOne(5) # returns 6
+```
+
+
+# Forcing the use of named parameters
+All parameters specified after the first asterisk in the function signature are
+keyword-only:
+```python
+def f(*a, b):
+    pass
+
+f(1, 2, 3)
+# TypeError: f() missing 1 required keyword-only argument: 'b'
+f(1, 2, 3, b=10) # ok
+```
+
+In Python 3 it's possible to put a single asterisk in the function signature to
+ensure that the remaining arguments may only be passed using keyword arguments.
+```python
+def f(a, b, *, c):
+    pass
+
+f(1, 2, 3)
+# TypeError: f() takes 2 positional arguments but 3 were given
+
+f(1, 2, c=3)
+# No error
+```
+
+
+# 33.10 Nested functions
+Functions in python are first-class objects. They can be defined in any scope
+```python
+def fibonacci(n):
+    def step(a, b):
+        return b, a+b
+    a, b = 0, 1
+    for i in range(n):
+        a, b = step(a, b)
+    return a
+```
+
+Functions capture their enclosing scope can be passed around like any other 
+sort of object
+```python
+def make_adder(n):
+    def adder(x):
+        return n+x
+    return adder
+
+add5 = make_adder(5)
+add6 = make_adder(6)
+add5(10) # Out: 15
+add6(10) # Out: 16
+
+def repeatly_apply(func, n, x):
+    for i in range(n):
+        x = func(x)
+    return x
+
+repeatly_apply(add5, 5, 1)
+# Out: 26
+```
 
 
 # Decorators
