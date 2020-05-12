@@ -36,6 +36,7 @@
 ## INSTALL zathura
 ```bash
 sudo apt-get install zathura
+sudo apt-get install xdotool
 ```
 
 ## CONFIG vimtex
