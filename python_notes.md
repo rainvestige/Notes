@@ -5683,6 +5683,53 @@ repeatly_apply(add5, 5, 1)
 ```
 
 
+# 33.11 Recursion limit
+There is a limit to the depth of possible recursion, which depends on the 
+Python implementation. When the limit is reached, a RuntimeError exception is 
+raised:
+```python
+def cursing(depth):
+    try:
+        cursing(depth + 1) # actually, re-cursing
+    except RuntimeError as RE:
+        print('I recursed {} times!'.format(depth))
+
+cursing(0)
+# Out: I recursed 998 times!
+```
+
+
+# 33.12 Recursive Lambda using assigned variable
+One method for creating recursive lambda functions involves assign the function
+to a variable and then referencing that variable within the function itself.
+A common example of this is the recursive calculation of the factorial of a
+number - such as shown in the following code:
+```python
+lambda_factorial = lambda i:1 if i==0 else i*lambda_factorial(i-1)
+print(lambda_factorial(4)) # 24
+```
+
+
+# 33.13 Recursive functions
+A recursive function is a function that calls itself in its definition. For 
+example the mathematical function, factorial, defined by `factorial(n)`. can be
+programmed as:
+```python
+def factorial(n)
+    if n == 0:
+        return 1
+    else:
+        return n*factorial(n-1)
+```
+
+
+# 33.14 Defining a function with arguments
+The function name and its list of arguments are called the signature of the 
+function. Each named argument is effectively a local variable of the function.
+
+
+# 33.15 Iterable and dictionary unpacking
+
 # Decorators
 - commonly used in frameworks
 
