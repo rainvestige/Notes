@@ -5729,8 +5729,66 @@ function. Each named argument is effectively a local variable of the function.
 
 
 # 33.15 Iterable and dictionary unpacking
+Funtions allow you to specify these types of parameters: positional, named,
+variable positional, keyword args(kwargs).
+
+
+# 33.16 Defining a function with multiple arguments
+One can give a function as many arguments as one wants, the only fixed rules
+are that each argument name must be unique and that optional arguments must be
+after the not-optional ones:
+```python
+def func(value1, value2, optionalvalue=10):
+    return "{0} {1} {2}".format(value1, value2, optionalvalue)
+```
+
+When calling the function you can either give each keyword without the name but
+then the order matters:
+```python
+print(func(1, 'a', 100))
+# Out: 1 a 100
+
+print(func('abc', 14))
+# Out: abc 14 100
+```
+
+Or combine giving the arguments with name and without. Then the ones with name 
+must follow those without but the order of the ones with name doesn't matter.
+```python
+print(func('This', optionalvalue='StackOverflow Documentation', value2='is'))
+# Out: This is StackOverflow documentation
+```
+
+
+# Chapter 34: Defining functions with list arguments
+
+# 34.1 Function and Call
+Lists as arguments are just another variable:
+```python
+def func(my_list):
+    for item in my_list:
+        print(item)
+```
+and can be passed in the function call itself:
+```python
+func([1, 2, 3, 5, 7])
+# 1
+# 2
+# 3
+# 5
+# 7
+```
+Or as a variable:
+```python
+aList = ['a', 'b', 'c']
+func(aList)
+# a
+# b
+# c
+```
 
 # Decorators
+
 - commonly used in frameworks
 
 ## snippet
