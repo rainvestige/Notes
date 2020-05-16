@@ -107,6 +107,156 @@ to a fixed value.
 
 
 # Chapter 37: Decorators
+| Parameters | Details                               |
+|------------|---------------------------------------|
+| f          | The function to be decorated(wrapped) |
+
+Decorator functions are software design patterns. They dynamically alter the
+functionality of a function, method, or class without having to directly use
+subclasses or change the source code of the decorated function. When used 
+correctly, decorators can become powerful tools in the development process.
+This topic covers implementation and applications of decorator functions in
+Python.
+
+
+### 37.1 Decorator function
+Decorators augment the behavior of other functions or methods. Any function 
+that takes a function as a parameter and returns an augmented function can be
+used as a decorator.
+```python
+# This simplest decorator does nothing to the function being decorated. Such
+# minimal decorators can occassionally be used as a kind of code markers.
+def super_secret_function(f):
+    return f
+
+@super_secret_function
+def my_function():
+    print("This is  my secret function.")
+```
+
+The `@-notation` is syntactic sugar that is equivalent to the following:
+```python
+my_function = super_secret_function(my_function)
+```
+
+It is important to bear this in mind in order to understand how the decorators
+works. This "unsugared" syntax makes it clear why the decorator function takes
+a function as an argument, and why it should return another function. It also
+demonstrates what would happen if you don't return a function:
+```python
+def disable(f):
+    """
+    This function returns nothing, and hence removes the decorated function
+    from the local scope.
+    """
+    pass
+
+@disable
+def my_function():
+    print("This function can no longer be called...")
+
+
+my_function()
+# TypeError: 'NoneType' object is not callable
+```
+
+Thus, we usually define a _new function_ inside the decorator and return it.
+This new function would first do something that it needs to do, then call the
+original function, and finally process the return value. Consider this simple
+decorator function that prints the arguments that the original function 
+receives, then calls it.
+```python
+# This is the decorator
+def print_args(func):
+    def inner_func(*args, **kwargs):
+        print(args)
+        print(kwargs)
+        return func(*args, **kwargs) # Call the original function with its args
+    return inner_func
+
+@print_args
+def multiply(num_a, num_b):
+    return num_a * num_b
+
+
+print(multiply(3, 5))
+# Out:
+# (3, 5)
+# {}
+# 15
+```
+
+
+### 37.2 Decorator class
+As mentioned in the introduction, a decorator is a function that can be applied
+to another function to augment its behavior. The syntactic sugar is equivalent
+to the following: `my_func = decorator(my_func)`. But what if the decorator was
+instead a class. If this class implements the `__call__()` magic method, then 
+it would still be possible to use my_func as if was a function:
+```python
+class Decorator(object):
+    """Simple decorator class."""
+
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        print('Before the function call.')
+        res = self.func(*args, **kwargs)
+        print('After the function call.')
+        return res
+
+
+@Decorator
+def testFunc():
+    print('Inside the function.')
+
+testFunc()
+# Before the function call.
+# Inside the function.
+# After the function call.
+```
+
+Note that a function decorated with a class decorator will no longer be 
+consider a 'function' from type-checking perspective:
+```python
+import types
+isinstance(testFunc, types.FunctionType)
+# False
+type(testFunc)
+# <class '__main__.Decorator'>
+```
+
+__Decorating Methods__
+
+For decorating methods you need to define an additional `__get__`-method:
+```python
+from types import MethodType
+
+class Decorator(object):
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        print('Inside the decorator.')
+        return self.func(*args, **kwargs)
+
+    def __get__(self, instance, cls):
+        # Return a Method if it is called on instance
+        return self if instance is None else MethodType(self, instance)
+
+
+class Test(object):
+    @Decorator
+    def __init__(self):
+        pass
+
+
+a = Test()
+# Inside the decorator.
+```
+
+__Warning__
 
 
 
