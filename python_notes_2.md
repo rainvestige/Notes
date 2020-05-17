@@ -257,6 +257,220 @@ a = Test()
 ```
 
 __Warning__
+Class Decorators only produce one instance for a specific function so 
+decorating a method with a class decorator will share the same decorator
+between all instances of that class:
+```python
+from types import MethodType
+
+class CountCallsDecorator(object):
+    def __init__(self, func):
+        self.func = func
+        self.ncalls = 0  # Number of calls of this method
+
+    def __call__(self, *args, *kwargs):
+        self.ncalls += 1  # Increment the calls counter
+
+    def __get__(self, instance, cls):
+        return self if instance is None else MethodType(self, instance)
+
+
+class Test(object):
+    def __init__(self):
+        pass
+
+    @CountCallsDecorator
+    def do_something(self):
+        return 'something was done'
+
+
+a = Test()
+a.do_something()
+a.do_something.ncalls  # 1
+b = Test()
+b.do_something()
+b.do_something.ncalls  # 2
+```
+
+
+### 37.3 Decorator with arguments(decorator factory)
+A decorator takes only one argument: the function to be decorated. There is no
+way to pass other arguments. But additional arguments are often desired. The 
+trick is then to make a function which takes arbitrary arguments and returns a
+decorator.
+
+__Decorator functions__
+```python
+def decorator_factory(message):
+    def decorator(func):
+        def wrapped_func(*args, **kwargs):
+            print('The decorator wants to tell you: {}'.format(message))
+            return func(*args, **kwargs)
+        return wrapped_func
+    return decorator
+
+
+@decorator_factory('Hello, World')
+def test():
+    pass
+
+test()
+# The decorator wants to tell you: Hellow World
+```
+
+__Important Note__
+With such decorator factories you must call the decorator with a pair of 
+parentheses:
+```python
+@decorator_factory # Without paretheses
+def test():
+    pass
+
+test()
+# TypeError: decorator() missing 1 required positional argument: 'func'
+```
+
+__Decorator classes__
+```python
+def decorator_factory(*decorator_args, **decorator_kwargs):
+    
+    class Decorator(object):
+        def __init__(self, func):
+            self.func = func
+
+        def __call__(self, *args, **kwargs):
+            """The *args and **kwargs are arguments for func"""
+            print('Inside the decorator with arguments {}'.format(decorator_args))
+            return self.func(*args, **kwargs)
+
+    return Decorator
+
+
+@decorator_factory(10)
+def test():
+    pass
+
+test()
+# Inside the decorator with arguments(10, )
+```
+
+
+### 37.4 Making a decorator look like the decorated function
+Decorators normally strip function metadata as they aren't the same. This can
+cause problems when using meta-programming to dynamically access function
+metadata. Metadata also includes function's docstrings and its name. 
+`functools.wraps` makes the decorated function look like the original function
+by copying several attributes to the wrapper function.
+```python
+from functools import wraps
+```
+
+The two methods of wrapping a decorator are achieving th same thing in hiding
+that the original funciton has been decorated. There is no reason to perfer the
+function version to the class version unless you're already using one over the 
+other.
+
+__As a function__
+```python
+def decorator(func):
+    # Copies the docstring, name, annotations and module to the decorator
+    @wraps(func)
+    def wrapped_func(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapped_func
+
+
+@decorator
+def test():
+    pass
+
+test.__name__
+# 'test'
+```
+
+__As a class__
+```python
+class Decorator(object):
+    def __init__(self, func):
+        # Copies name, module, annotations and docstring to the instance
+        self._wrapped = wraps(func)(self)
+
+    def __call__(self, *args, **kwargs):
+        return self._wrapped(*args, **kwargs)
+
+
+@Decorator
+def test():
+    """Docstring of test."""
+    pass
+
+test.__doc__
+# 'Docstring of test'
+```
+
+
+### 37.5 Using a decoratorto time a function
+```python
+import time
+
+
+def timer(func):
+    def inner(*args, *kwargs):
+        t1 = time.time()
+        f = func(*args, *kwargs)
+        t2 = time.time()
+        print('Runtime took {0} seconds'.format(t2-t1))
+        return f
+    return inner
+
+@timer
+def example_function():
+    # do stuff
+
+example_function()
+```
+
+
+### 37.6 Create singleton class with a decorator
+A singleton is a pattern that restricts the instantiation of a class to one
+instance/object. Using a decorator, we can define a class as a singleton by
+forcing the class to either return an existing instane of the class or create a
+new instance(if it doesn't exist).
+```python
+def singleton(cls):
+    instance = [None]
+    def wrapper(*args, **kwargs):
+        if instance[0] is None:
+            instance[0] = cls(*args, **kwargs)
+        return instance[0]
+    return wrapper
+```
+
+This  decorator can be added to any class declaration and will make sure that
+at most one instance of the class is created. Any subsequent calls will return
+the already existing class instance.
+```python
+@singleton
+class SomeSingletonClass(object):
+    x = 2
+    def __init__(self):
+        print("Created")
+
+
+instance = SomeSingletonClass()  # prints: Created
+instance = SomeSingletonClass()  # doesn't print anything
+print(instance.x)                # 2
+
+instance.x = 3
+print(SomeSingletonClass().x)    # 3
+```
+
+So it doesn't matter whether you refer to the class instance via your local
+variable or whether you create another "instance", you always get the same
+object.
 
 
 
+# Chapter 38: Classes
+
+### 38.1 Introduction to classes
