@@ -474,3 +474,341 @@ object.
 # Chapter 38: Classes
 
 ### 38.1 Introduction to classes
+A class, functions as a template that defines the basic characteristics of a
+particular object. Here's an example:
+```python
+class Person(object):
+    """A simple class."""           # docstring
+    species = "Homo Sapiens"        # class attribute
+
+    def __init__(self, name):
+        """This is the initializer. 
+        It's a special method.
+        """
+        self.name = name            # instance method
+
+
+    def __str__(self):
+        """This method is run when Python tries
+        to cast the object to a string. Return
+        this string when using print(), etc.
+        """
+        return self.name
+
+
+    def rename(self, renamed):      # regular method
+        """Reassign and print the name attribute."""
+        self.name = renamed
+        print("Now my name is {}".format(self.name))
+```
+
+There are a few things to note when looking at the above example.
+1. The class is made up of _attributes(data)_ and _methods(functions)_.
+2. Attributes and methods are simply defined as normal variables and functions.
+3. As noted in the corresponding docstring, the `__init()__` method is called
+    the _initializer_. It's equivalent to the constructor in other object 
+    oriented languages, and is the method that is first run when you create a
+    new object, or new instance of the class.
+4. Attributes that apply to thye whole class are defined first, and are called
+    _class attributes_.
+5. Attributes that apply tp a specific instance of a class(an object) are 
+    called _class attributes_. They are generally defined inside `__init__()`;
+    this is not necessray, but it is recommended(since attributes defined 
+    outside of `__init__()` run the risk of being accessed before they are 
+    defined.)
+6. Every method, included in the class definition passes the object in question
+    as its first parameter. The word `self` is used for this parameter(usage of
+    `self` is actually by convention, as the word `self` has no inherent 
+    meaning in Python, but this is one of Python's most respected conventions,
+    and you should always follow it).
+7. Those used to object-oriented progamming in other languages may be surprised
+    by a few things. One is that Python has no real concept of `private` 
+    elements, so everything, by default, imitates the behavior of the C++/Java
+    public keyword. For more information, see the "Private Class Members" 
+    example on this page.
+8. Some of the class's methods have the following form: `__functionname__(self
+    , other_stuff).` All such methods are called "magic methods" and are an 
+    important part of classes in Python. For instance, operator overloading in
+    Python is implemented with magic methods. For more information, see the
+    relevant documentation.
+
+Now let's make a few instances of our Person class!
+```python
+# Instances
+kelly = Person("Kelly")
+joseph = Person("Joseph")
+john_doe = Person("John Doe")
+
+
+# Note again the difference between class and instance attributes:
+>>>kelly.species
+'Homo Sapiens'
+>>>john_doe.species
+'Homo Sapiens'
+>>>joseph.species
+'Homo Sapiens'
+
+>>> kelly.name
+'Kelly'
+>>> joseph.name
+'Joseph'
+
+
+>>> # Methods
+>>> john_doe.__str__()
+'John Doe'
+>>> print(john_doe)
+'John Doe'
+>>> john_doe.rename("John")
+'Now my name is John'
+```
+
+
+### 38.2 Bound, unbound, and static methods
+The idea of bound and unbound methods was `removed in Python3`. In Python3 when
+you declare a method within a class, you are using a `def` keyword, thus 
+creating a function object. THis is a regular function, and the surrounding 
+class works as its namespace. In the following example we declare method f 
+within class A, and it becomes a function A.f:
+
+```python
+# Python 3.x
+class A(object):
+    def f(self, x)
+        return 2 * x
+
+A.f
+# <function A.f at ...>
+```
+
+In Python2 the behavior was different: function objects within the class were 
+implicitly replaced with objects of type `instancemethod`, which were called
+_unbound methods_ because they were not bound to any particular class instance.
+It was possible to access the underlying function using `.__func__` property.
+
+```python
+# Python2.x
+A.f
+# <unbound method A.f>
+A.f.__class__
+# <type 'instancemethod'>
+A.f.__func__
+# < function f at ...>
+```
+
+The latter behaviors are confirmed by inspection - methods are recognized as
+functions in Python3, while the distinction is upheld in Python 2.
+
+```python
+# Python3.x
+import inspect
+
+inspect.isfunction(A.f)
+# True
+inspect.ismethod(A.f)
+# False
+```
+
+```python
+# Python 2.x
+import inspect
+
+inspect.isfunction(A.f)
+# False
+inspect.ismethod(A.f)
+# True
+```
+
+In both versions of Python function/method A.f can be called directly, provided
+that you pass an instance of class A as the first argument.
+
+```python
+A.f(1, 7)
+# Python 2: TypeError: unbound method f() must be called with
+#                      A instance as first argument(got int instance instead)
+# Python 3: 14
+a = A()
+A.f(a, 20)
+# Python 2 & 3: 40
+```
+Now suppose `a` is an instance of class A, what is `a.f` then? Well, 
+intuitively this should be the same method f of class A, only it should somehow
+"know" that it was applied to the object `a` - in python this is callde method
+bound to `a`.
+
+The nitty-gritty details are as follows: writing a.f invokes the magic 
+`__getattribute__` method of a , which ﬁrst checks whether a has an attribute 
+named f (it doesn't), then checks the class A whether it contains a method 
+with such a name (it does), and creates a new object m of type method which 
+has the reference to the original A.f in `m.__func__` , and a reference to the 
+object a in `m.__self__` . When this object is called as a function, it simply 
+does the following: `m(...) => m.__func__(m.__self__, ...)` . Thus this object 
+is called a bound method because when invoked it knows to supply the object it 
+was bound to as the ﬁrst argument. (These things work same way in Python 2 and 
+3)
+
+```python
+a = A()
+a.f
+# < bound method A.f of <__main__.A object at ...>>
+a.f(2)
+# 4
+
+# Note: the bound method object a.f is recreated *every time* you call it:
+a.f is a.f  # False
+# As a performance optimization you can store the bound method in the object's
+# __dict__, in which case the method object will remain fixed:
+a.f = a.f
+a.f is a.f  # True
+```
+
+Finally, Python has __class methods__ and __static methods__ -- special kinds
+of methods. Class methods work the same way as regular methods, except that 
+when invoked on an object they bind to the class of the object instead of to 
+the object. Thus `m.__self__ = type(a)`. When you call such bound method, it
+passes the class of a as the first argument. Static methods are even simpler:
+they don't bind anything at all, amd simply return the underlying function 
+without any transformations.
+
+```python
+class D(object):
+    multiplier = 2
+
+    @classmethod
+    def f(cls, x):
+        return cls.multiplier * x
+
+    @staticmethod
+    def g(name):
+        print("Hello, %s" % name)
+
+
+D.f
+# <bound method type.f of <class '__main__.D'>>
+D.f(12)
+# 24
+D.g
+# <function D.g at ...>
+D.g("world")
+# Hello, world
+```
+
+Note that class methods are bound to class even when accessed on the instance:
+```python
+d = D()
+d.multiplier = 1337
+(D.multiplier, d.multiplier)
+(2, 1337)
+d.f
+# <bound method D.f of <class '__main__.D'>>
+d.f(10)
+# 20
+```
+
+It is worth noting that at the lowest level, functions, methods, staticmethods,
+etc. are actually descriptors that invoke `__get__, __set__` and optionally 
+`__del__` special methods.
+
+
+### 38.3 Basic inheritance
+A new class can be derived from an existing class as follows:
+```python
+class BaseClass(object):
+    pass
+
+
+class DerivedClass(BaseClass):
+    pass
+```
+
+The `BaseClass` is the already existing(parent) class, and the `DerivedClass` 
+is the new(child) class that inherits(or sunclasses) attributes from `BaseClass`
+__Note__: all classes implicitly inherit from the object class, which is the 
+base class for all built-in types.
+
+```python
+class Rectangle():
+    def __init__(self, w, h):
+        self.w = w
+        self.h = h
+
+    def area(self):
+        return self.w * self.h
+
+    def perimeter(self):
+        return 2 * (self.w + self.h)
+```
+
+The Rectangel class can be used as a base class for defining a Square class, as
+a square is a special case of rectangle.
+
+```python
+class Square(Rectangel):
+    def __init__(self, s):
+        # call parent constructor, w and h are both s
+        super(Square, self).__init__(s, s)
+        self.s = s
+```
+
+The Square class will automatically inherit all attributes of the Rectangle 
+class as well as the object class. `super()` is used to call the `__init__()`
+method of a Rectangle class, essentially calling any overridden method of the
+base class.
+
+__Note__: in Python3, `super()` does not require arguments.
+
+Derived class objects can access and modify the attributes of its base classes:
+```python
+r.area()
+# Output: 12
+r.perimeter()
+# Output: 14
+
+s.area()
+# Output: 4
+s.perimeter()
+# Output: 8
+```
+
+__Built-in functions that work with inheritance__
+```
+issubclass(DerivedClass, BaseClass): return True if DerivedClass is subclass of
+the BaseClass
+
+isinstance(s, Class): return True if s is an instance of Class or any of the 
+derived  classes of Class
+```
+
+```python
+issubclass(Square, Rectangle)
+# True
+
+r = Rectangle(3, 4)
+s = Square(2)
+
+isinstance(r, Rectangle)
+# True
+
+isinstance(r, Square)
+# False
+# a rectangle is not a square
+
+isinstance(s, Rectangle)
+# True
+# A square is a rectangle
+isinstance(s, Square)
+# True
+```
+
+
+### 38.4 Monkey Patching
+In this case, "monkey patching" means adding a new variable or method to a 
+class after it's been defined. For instance, say we defined class A as
+```python
+class A(object):
+    def __init__(self, num):
+        self.num = num
+
+    def __add__(self, other):
+        return A(self.num + other.num)
+```
