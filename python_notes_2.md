@@ -812,3 +812,204 @@ class A(object):
     def __add__(self, other):
         return A(self.num + other.num)
 ```
+
+But now we want to add another function later in the code. Suppose this 
+function is as folows.
+```python
+def get_num(self):
+    return self.num
+```
+
+But how do we add this as a method in A? That's simple we just essentially
+place that function into A with an assignment statement.
+```python
+A.get_num = get_num
+```
+
+Why does this work? Because functions are objects just like any other object,
+and methods are functions that belong to the class.
+
+The function `get_num` shall be available to all existing(already created) as
+well to the new instances of A. These additions are available on all instances
+of that class(or its subclasses) automatically. For example:
+```python
+foo = A(42)
+
+A.get_num = get_num
+
+bar = A(5)
+
+foo.get_num()  # 42
+bar.get_num()  # 6
+```
+
+Note that, unlike some other languages, this technique does not work for 
+certain built-in types, and it is not considered good style.
+
+
+### 38.5 New-style vs. old-style classes
+New-style class were introduced in Python 2.2 to unify classes and types. They
+inherit from the top-level `object` type.
+
+Old-style classes do not inherit from `object`. Old-style instances are always
+implemented with a built-in instance type.
+
+In Python 3, old-style classes were removed.
+
+New-style classes in Python3 implicitly inherit from `object`, so there is no
+need to specify `MyClass(object)` anymore.
+
+
+### 38.6 Class methods: alternate initializers
+Class methods present alternate ways to build instances of classes. To 
+illustrate, let's look at an example. Let's suppose we have a relatively simple
+`Person` class:
+
+```python
+class Person(object):
+    def __init__(self, first_name, last_name, age):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.age = age
+        self.full_name = first_name + " " + last_name
+
+    def greet(self):
+        print('Hello, my name is ' + self.full_name + '.')
+```
+
+It might be handy to have a way to build instances of this class specifying a
+full name instead of first and last name separately. One way to do this would
+be to have `last_name` be an optional parameter, and assuming that if it isn't
+given, we passed the full name in:
+```python
+class Person(object):
+    def __init__(self, first_name, age, last_name=None):
+        if last_name == None:
+            self.first_name, self.last_name = first_name.split(' ', 2)
+        else:
+            self.first_name = first_name
+            self.last_name = last_name
+        self.age = age
+        self.full_name = first_name + " " + last_name
+
+    def greet(self):
+        print('Hello, my name is ' + self.full_name + '.')
+```
+
+However, there are two main problems with this bit of code:
+1.  The parameters first_name and last_name are now misleading, since you can
+    enter a full name for `first_name`. Also, if there are more cases and/or
+    more parameters that have this kind of flexibility, the if/elif/else 
+    branching can get annoying fast.
+2.  Not quite as important, but still worth pointing out: what if `last_name`
+    is None, but first_name doesn't split into two or more things via spaces?
+    We have yet another layer of input validation and/or exception handling...
+
+Enter class mehtods. Rather than having a single initializer, we will create a
+separate initializer, called `from_full_name`, and decorate it with the 
+(built-in) `classmethod` decorator.
+
+```python
+class Person(object):
+    def __init__(self, first_name, last_name, age):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.age = age
+        self.full_name = first_name + " " + last_name
+
+    @classmethod
+    def from_full_name(cls, name, age):
+        if ' ' not in name:
+            raise ValueError
+        first_name, last_name = name.split(' ', 2)
+        return cls(first_name, last_name, age)
+
+    def greet(self):
+        print('Hello, my name is ' + self.full_name + '.')
+```
+
+Notice `cls` instead of `self` as the first argument to `from_full_name`. Class
+methods are applied to the overall class, not an instance of a given class(
+which is what `self` usually denotes). So, if `cls` is our Person class, then
+the returned value from the `from_full_name` class method is `Person(
+first_name, last_name, age)`, which uses Person's `__init__` to create an 
+instance of the Person class. In particular, if we were to make a subclass
+Emploee of Person, then `from_full_name` would work in the Employee class as
+well.
+
+To show that this works as expected, let's create instances of Person in more
+than one way without the branching in `__init__`:
+```python
+bob = Person("Bob", "Bobberson", 24)
+
+alice = Person.from_full_name("Alice Henderson", 31)
+
+bob.greet()
+# Hello, my name is Bob Bobberson.
+
+alice.greet()
+# Hello, my name is Alice Henderson.
+```
+
+
+### 38.7 Multiple Inheritance
+Python uses the `C3 linearization` algorithm to determine the order in which to
+resolve class attributes, including methods, This is known as the Method 
+Resolution Order(MRO).
+
+Here's a simple example:
+```python
+class Foo(object):
+    foo = 'attr foo of Foo'
+
+class Bar(object):
+    foo = 'attr foo of Bar'  # we won't see this.
+    bar = 'attr bar of Bar'
+
+class FooBar(Foo, Bar):
+    foobar = 'attr foobar of FooBar'
+```
+
+Now if we instantiate FooBar, if we look up the foo attribute, we see that 
+Foo's attributes is found first
+```python
+fb = FooBar()
+
+>>> fb.foo
+# 'attr foo of Foo'
+```
+
+Here's the MRO of FooBar:
+```
+>>> FooBar.mro()
+[<class '__main__.FooBar'>, <class '__main__.Foo'>, <class '__main__.Bar'>, <type 'object'>]
+```
+
+It can be simply stated that Python's MRO algorithm is
+1. Depth first(e.g. FooBar then Foo) unless
+2. a shared parent(object) is blocked by a child(Bar) and
+3. no circular relationships allowde.
+
+That is, for example, Bar cannot inherit from FooBar while FooBar inherits from
+Bar.
+
+Another powerful feature in inheritance is `super`. super can fetch parent 
+classes features.
+
+```python
+class Foo(object):
+    def foo_method(self):
+        print('foo Method')
+
+class Bar(object):
+    def bar_method(self):
+        print('bar Method')
+
+class FooBar(Foo, Bar):
+    def foo_method(self):
+        super(FooBar, self).foo_method()
+```
+
+Multiple inheritance with init method of class, when every class has own init
+method then we try for multiple inheritance then only init method get called of
+class which is inherit first.
