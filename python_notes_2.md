@@ -1013,3 +1013,415 @@ class FooBar(Foo, Bar):
 Multiple inheritance with init method of class, when every class has own init
 method then we try for multiple inheritance then only init method get called of
 class which is inherit first.
+
+For below example only Foo class __init__ method getting called, __Bar__ class
+init not getting called
+```python
+class Foo(object):
+    def __init__(self):
+        print('foo init')
+
+class Bar(object):
+    def __init__(self):
+        print('bar init')
+
+class FooBar(Foo, Bar):
+    def __init__(self):
+        print('foobar init')
+        super(FooBar, self).__init__()
+
+a = FooBar()
+# foobar init
+# foo init
+```
+
+But it doesn't mean that Bar class is not inherit. instance of final FooBar 
+class is also instance of Bar class and Foo class.
+```python
+print(isinstance(a, FooBar)) # True
+print(isinstance(a, Bar))    # True
+print(isinstance(a, Foo))    # True
+```
+
+
+### 38.8 Properties
+Python classes support properties, which look like regular object variables, 
+but with the possibility of attaching custom behavior and documentation.
+
+```python
+class MyClass(object):
+    def __init__(self):
+        self._my_string = ''
+
+    @property
+    def string(self):
+        """A profoundly important string."""
+        return self._my_string
+
+    @string.setter
+    def string(self, new_value):
+        assert isinstance(new_value, str), \
+               "Give me a string, not a %r!" % type(new_value)
+        self._my_string = new_value
+
+    @string.deleter
+    def x(self):
+        self._my_string = None
+```
+
+The object's of class MyClass will appear to have a property `.string`, however
+it's behavior is now tightly controlled:
+```python
+mc = MyClass()
+mc.string = "String!"
+print(mc.string)
+del mc.string
+```
+
+As well as the useful syntax as above, the property syntax allows for 
+validation, or other augmentations to be added to those attributes. This could
+be especially useful with public APIs - where a level of help should be given 
+to the user.
+
+Another common use of properties is to enable the class to persent "virtual
+attributes: - attributes which aren't actually stored but are computed only
+when requested.
+
+```python
+class Character(object):
+    def __init__(self, name, max_hp):
+        self._name = name
+        self._hp = max_hp
+        self._max_hp = max_hp
+
+    # Make hp read only by not providing a set method
+    @property
+    def hp(self):
+        return self._hp
+
+    # Make name read only by not providing a set method
+    @property
+    def name(self):
+        return self.name
+
+    def take_damage(self, damage):
+        self.hp -= damage
+        self.hp = 0 if self.hp < 0 else self.hp
+
+    @property
+    def is_alive(self):
+        return self.hp != 0
+
+    @property
+    def is_wounded(self):
+        return self.hp < self.max_hp if self.hp > 0 else False
+
+    @property
+    def is_dead(self):
+        return not self.is_alive
+
+
+bilbo = Character('Bilbo Baggins', 100)
+bilbo.hp
+# out: 100
+bilbo.hp = 200
+# out: AttributeError: can't set attribute
+# hp attribute is read only.
+
+bilbo.is_alive # True
+bilbo.is_wounded # False
+bilbo.is_dead  # False
+
+bilbo.take_damage(50)
+bilbo.hp    # 50
+
+bilbo.is_alive # True
+bilbo.is_wounded # True
+bilbo.is_dead  # False
+
+bilbo.take_damage(50)
+bilbo.hp    # 50
+
+bilbo.is_alive # False
+bilbo.is_wounded # True
+bilbo.is_dead  # True
+```
+
+
+### 38.9 Default values for instance variables
+If the variable contains a value of an immutable type(e.g. a string) then it is
+okay to assign a default value like this
+```python
+class Rectangle(object):
+    def __init__(self, width, height, color='blue'):
+        self.width = width
+        self.height = height
+        self.color = color
+
+    def area(self):
+        return self.width * self.height
+
+
+# Create some instances of the class
+default_rectangle = Rectangle(2, 3)
+print(default_rectangle.color)  # blue
+
+red_rectangle = Rectangle(2, 3, 'red')
+print(red_rectangle.color)  # red
+```
+
+One needs to be careful when initializing mutable objects such as lists in the
+constructor. Consider the following example:
+```python
+class Rectangle2D(object):
+    def __init__(self, width, height, pos=[0, 0], color='blue'):
+        self.width = width
+        self.height = height
+        self.pos = pos
+        self.color = color
+
+
+r1 = Rectangle2D(5, 3)
+r2 = Rectangle2D(7, 8)
+r1.pos[0] = 4
+r1.pos  # [4, 8]
+r2.pos  # [4, 8] r2's pos has changed as well
+```
+
+This behavior is caused by the fact that in Python default parameters are bound
+at function execution and not at function declaration. To get a default 
+instance variable that's not shared among instances, one should use a construct
+like this:
+```python
+class Rectangle2D(object):
+    def __init__(self, width, height, pos=None, color='blue'):
+        self.width = width
+        self.height = height
+        self.pos = pos or [0, 0] 
+        self.color = color
+
+
+r1 = Rectangle2D(5, 3)
+r2 = Rectangle2D(7, 8)
+r1.pos[0] = 4
+r1.pos  # [4, 0]
+r2.pos  # [0, 0]
+```
+
+
+### 38.10 Class and instance variables
+Instance variables are unique for each instance, while class variables are 
+shared by all instances.
+
+```python
+classs C:
+    x = 2  # calss variable
+
+    def __init__(self, y)
+        self.y = y  # instance variable
+
+
+C.x  # 2
+C.y  # AttributeError: type object 'C' has no attribute 'y'
+
+c1 = C(3)
+c1.x # 2
+c1.y # 3
+
+c2 = C(4)
+c2.x # 2
+c2.y # 4
+```
+
+Class variables can be accessed on instances of this class, but assigning to 
+the class attribute will create an instance variable which shadows the class
+variable
+
+```python
+c2.x = 4
+c2.x  # 4
+C.x   # 2
+```
+
+Note that mutating class variables from instances can lead to some unexpected
+consequences.
+```python
+class D:
+    x = []
+    def __init__(self, item):
+        self.x.append(item)  # note that this is not an assignment!
+
+
+d1 = D(1)
+d2 = D(2)
+
+d1.x  # [1, 2]
+d2.x  # [1, 2]
+D.x   # [1, 2]
+```
+
+
+### 38.11 Class composition
+Class composition allows explicit relations between objects. In this example,
+people live in cities that belong to countries. Composition allows people to
+access the number of all people living in their country:
+```python
+class Country(object):
+    def __init__(self):
+        self.cities = []
+
+    def addCity(self, city):
+        self.cities.append(city)
+
+
+class City(object):
+    def __init__(self, numPeople):
+        self.people = []
+        self.numPeople = numPeople
+
+    def addPerson(self, person):
+        self.people.append(person)
+
+    def join_country(self, country):
+        self.country = country
+        country.addCity(self)
+
+        for i in range(self.numPeople):
+            person(i).join_city(self)
+
+
+class Person(object):
+    def __init__(self, ID):
+        self.ID = ID
+
+    def join_city(self, city):
+        self.city = city
+        city.addPerson(self)
+
+    def people_in_my_country(self):
+        x = sum([len(c.people) for c in self.city.country.cities])
+        return x
+
+
+US = Country()
+NYC = City(10).join_country(US)
+SF = CIty(5).join_country(US)
+
+print(US.cities[0].people[0].people_in_my_country())
+# 15
+```
+
+
+### 38.12 Listing All Class Members
+The `dir()` function can be used to get a list of the members of class:
+```python
+dir(Class)
+```
+
+For example:
+```python
+>>> dir(list)
+['__add__', '__class__', '__contains__', ...]
+```
+
+It is common to look only for "non-magic" members. This can be done using a
+simple comprehension that lists members with names not starting with `__`:
+```python
+>>> [m for m in dir(list) if not m.startswith('__')]
+['append', 'clear', 'copy', 'count', 'extend', 'index', 'insert', 'pop', 
+'remove', 'reverse', 'sort']
+```
+
+
+### 38.13 Singleton class
+A singleton is a pattern that restricts the instantiation of a class to one
+instance/object. For more info on python singleton design patterns, see [here](
+https://python-3-patterns-idioms-test.readthedocs.io/en/latest/Singleton.html)
+
+```python
+class Singleton:
+
+    def __new__(cls):
+        try:
+            it = cls.__it__
+        except AttributeError:
+            it = cls.__it__ = object.__new__(cls)
+        return it
+
+    def __repr__(self):
+        return '<{}>'.format(self.__class__.__name__.upper())
+
+    def __eq__(self, other):
+        return other is self
+```
+
+Another method is to decorate your class. Following the example create a 
+Singleton class:
+```python
+class Singleton:
+    def __init__(self, decorated):
+        self._decorated = decorated
+
+    def Instance(self):
+        """
+        Returns the singleton instance. Upon its first call, it creates a new
+        instance of the decorated class and calls its `__init__` method. On all
+        subsequent calls, the already created instance is returned.
+        """
+        try:
+            return self._instance
+        except AttributeError:
+            self._instance = self._decorated()
+            return self._instance
+
+    def __call__(self)
+        raise TypeError('Singletons must be accessed throuth `Instance()`.')
+
+    def __instancecheck__(self, inst):
+        return isinstance(inst, self._decorated)
+```
+
+To use you can use the Instance method
+```python
+@Singleton
+class Single:
+    def __init__(self):
+        self.name = None
+        self.val = 0
+
+    def getName(self):
+        print(self.name)
+
+x = Single.Instance()
+y = Single.Instance()
+x.name = "I'm single"
+x.getName()  # I'm single
+y.getName()  # I'm single 
+```
+
+
+### 38.14 Descriptors and Dotted Lookups
+__Descriptors__ are objects that are (usually) attributes of classes and that 
+have any of `__get__, __set__`, pr `__delete__` special methods.
+
+__Data Descriptors__ have any of `__set__, or __delete__`
+
+These can control the dotted lookup on an instance, and are used to implement
+functions, `staticmethod, classmethod, and property`. A dotted lookup(e.g. 
+instance foo of class Foo looking up attribute bar-i.e. foo.bar) uses the 
+following algorithm:
+1. `bar` is looked up in the class, Foo. If it is there and it is a 
+    __Data Descriptor__, then the data descriptor is used. That's how `property`
+    is able to control access to data in an instance, and instances cannot 
+    override this.  If a __Data Descriptor__ is not there, then.
+2. bar is looked up in the instance `__dict__`. This is why we  can override or
+    block methods being called from an instance with a dotted lookup. If bar 
+    exists in the instance, it is used. If not, we then
+3. look in the class Foo for bar. If it is a Descriptor, then the descriptor
+    protocol is used. This is how functions(in this context, unbound methods),
+    `classmethod, and staticmethod` are implemented. Else it simply returns 
+    the object there, or there is an `AttributeError`
+
+
+
+# Chapter 39: Metaclasses
