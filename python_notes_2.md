@@ -1425,3 +1425,202 @@ following algorithm:
 
 
 # Chapter 39: Metaclasses
+Metaclasses allow you to deeply modify the behavior of Python classes(in terms
+of how they're defined, instantiated, accessed, and more) by replacing the 
+`type` metaclass that new classes use by default.
+
+
+### 39.1 Basic Metaclasses
+When `type` is called with three arguments it behaves as the (meta)class it is,
+and creates a new instance, ie. it produces a new class/type.
+
+```python
+Dummy = type('OtherDummy', (), dict(x = 1))
+Dummy.__class__             # <type 'type'>
+Dummy.__class__.__class__   # <type 'type'>
+```
+
+It is possible to subclass `type` to create an custom metaclass.
+```python
+class mytype(type):
+    def __init__(cls, name, bases, dict):
+        # call the base initializer
+        type.__init__(cls, name, bases, dict)
+
+        # perform custom initialization...
+        cls.__custom_attribute__ = 2
+```
+
+
+Now, we have a new custom mytype metaclass which can be used to create classes 
+in the same manner as type
+```python
+MyDummy = mytype('MyDummy', (), dict(x=2))
+MyDummy.__class__               # <class '__main__.mytype'>
+MyDummy().__class__.__class__   # <class '__main__.mytype'>
+MyDummy.__custom_attribute__    # 2
+```
+
+When we create a new class using the `class` keyword the metaclass is by 
+default chosen based on upon the baseclass
+```python
+class Foo(object):
+    pass
+
+type(Foo)
+# type
+```
+
+In the above example the only baseclass is `object` so our metaclass will be 
+the type of `object`, which is `type`. It is possible override the default, 
+however it depends on whether we use Python 2 or Python 3:
+
+Python 2.x Version <= 2.7
+
+A special class-level attribute `__metaclass__` can be used to specify the 
+metaclass.
+```python
+class MyDummy(object):
+    __metaclass__ = mytype
+
+type(MyDummy)  # <class '__main__.mytype'>
+```
+
+Python 3.x
+
+A special `metaclass` keyword argument specify the metaclass.
+```python
+class MyDummy(metaclass=mytype):
+    pass
+
+type(MyDummy)  # <class '__main__.mytype'>
+```
+
+Any keyword arguments(except metaclass) in the class declaration will be passed
+to the metaclass. Thus `class MyDummy(metaclass=mytype, x=2)` will pass `x=2` 
+as a keyword argument to the mytype constructor.
+
+
+
+### 39.2 Singletons using metaclasses
+A singleton is a pattern that restricts the instantiation of a class to one
+instance/object.
+```python
+class SingletonType(type):
+    def __call__(cls, *args, **kwargs):
+        try:
+            return cls.__instance
+        except AttributeError:
+            cls.__instance = super(SingletonType, cls).__call__(*args, **kwargs)
+            return cls.__instance
+
+# Python 2.x
+class MySingleton(object):
+    __metaclass__ = SingletonType
+
+# Python 3.x
+class MySingleton(metaclass=SingletonType):
+    pass
+
+MySingleton(0 is MySingleton()  # True, only one instantiation occurs
+```
+
+
+
+### 39.3 Using a metaclass
+__Metaclass syntax__
+
+Python 2.x
+```python
+class MyClass(object):
+    __metaclass__ = SomeMetaclass
+```
+
+Python 3.x
+```python
+class MyClass(metaclass=SomeMetaclass):
+    pass
+```
+
+Python 2 and 3 compatibility with six
+```python
+import six
+
+class MyClass(six.with_metaclass(SomeMetaclass)):
+    pass
+```
+
+
+
+### 39.4 Introduction to Metaclasses
+__What is a metaclass?__
+
+In Python, everything is an object: integers, strings, lists, even functions
+and classes themselves are objects. And every object is an instance of a class.
+
+To check the class of an object x, one can call `type(x)`, so:
+```python
+>>> type(5)
+<type 'int'>
+>>> type(str)
+<type 'type'>
+>>> type([1, 2, 3])
+<type 'list'>
+
+
+>>> class C(object):
+...     pass
+...
+>>> type(C)
+<type 'type'>
+```
+
+Most classes in Python are instances of `type`. `type` itself is also a class.
+Such classes whose instances are also classes are called metaclasses.
+
+__The Simplest Metaclass__
+Ok, so there is already one metaclass in Python: type. Can we create anther 
+one?
+
+```python
+class SimplestMetaclass(type):
+    pass
+
+class MyClass(object):
+    __metaclass__ = SimplestMetaclass
+```
+
+That does not add any functionality, but it is a new metaclass, see that 
+MyClass is now an instance of SimplestMetaclass:
+```python
+>>> type(MyClass)
+< class '__main__.SimplestMetaclass' >
+```
+
+__A Metaclass which does Something__
+A Metaclass which does something usually override type's `__new__`, to modify
+some properties of the class to be created, before calling the orginal 
+`__new__` which creates the class:
+```python
+class AnotherMetaclass(type):
+    def __new__(cls, name, parents, dict):
+        """
+        Args:
+            cls is this class
+            name is the name of the class to be created
+            parents is the list of the class's parent classes
+            dict is the list of class's attributes(methods, static variables)
+        """
+
+        # here all of the attributes can be modified before creating the class, 
+        # e.g.
+
+        dict['x'] = 8  # now the class will have a static variable x = 8
+
+        # return value is the new class. super will take care of that
+        return super(AnotherMetaclass, cls).__new__(cls, name, parents, dict)
+```
+
+
+
+### 39.5 Custon functionality with metaclasses
