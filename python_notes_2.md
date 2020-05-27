@@ -1624,3 +1624,313 @@ class AnotherMetaclass(type):
 
 
 ### 39.5 Custon functionality with metaclasses
+__Functionality in metaclasses__ can be changed so that whenever a class is 
+built, a string is printed to standard output, or an exception is thrown. This
+metaclass will print the name of the class being built.
+```python
+class VerboseMetaclass(type):
+    def __new__(cls, class_name, class_parents, class_dict):
+        print('Creating class ", class_name)
+        new_class = super().__new__(cls, class_name, class_parents, class_dict)
+        return new_class
+```
+
+You can use the metaclass like so:
+```python
+class Spam(metaclass=VerboseMetaclass):
+    def eggs(self):
+        print('[insert example string here]')
+
+
+s = Spam()
+s.eggs()
+# Out:
+# Creating class Spam
+# [insert example string here]
+```
+
+
+
+### 39.6 The default metaclass
+You may have heard that everything in Python is an object. It is true, and all
+objects have a class:
+```
+>>> type(1)
+int
+```
+
+The literal 1 is an instance of int. Let's declare a class:
+```
+>>> class Foo(object):
+...     pass
+...
+
+```
+
+Now let's instantiate it:
+```
+>>> bar = Foo()
+```
+
+What is the class of bar?
+```
+>>> type(bar)
+Foo
+```
+
+Nice, bar is an instance of Foo. But what is the class of Foo itself?
+```
+type(Foo)
+type
+```
+
+Ok, Foo is an instance of type. How about type itself?
+```
+>>> type(type)
+type
+```
+
+So what is a metaclass? For now let's pretend it is just a fancy name for the
+class of a class. Takeaways:
+    - Everything is an object in Python, so everything has a class
+    - The class of a class is called metaclass
+    - The default metaclass is type, and by far it is the most common metaclass
+
+But why should you know about metaclasses? Well, Python itself is quite 
+"hackable", and the concept of metaclass is important if you are doing advanced
+stuff like meta programming or if you want to control how your classes are
+initialized.
+
+
+
+# Chapter 40: String Formatting
+When storing and transforming data for humans to see, string formatting can 
+become very important. Python offers a wide variety of string formatting 
+methods which are outlined in this topic.
+
+
+
+### 40.1 Basics of String formatting
+```python
+foo = 1
+bar = 'bar'
+baz = 3.14
+```
+
+You can use `str.format` to format output. Bracket pairs are replaced with 
+arguments in the order in which the arguments are passed:
+```python
+print('{}, {} and {}'.format(foo, bar, baz))
+# Out: "1, bar and 3.14'
+```
+
+Indexes can also be specified inside the brackets. The numbers correspond to 
+indexes of the arguments passed to the `str.format` function(0-based).
+```python
+print('{0}, {1}, {2}, and {1}'.format(foo, bar, baz))
+# Out: '1, bar, 3.14, and bar'
+print('{0}, {1}, {2}, and {3}'.format(foo, bar, baz))
+# Out: index out of range error
+```
+
+Named arguments can be also used:
+```python
+print('X value is: {x_val}. Y value is: {y_val}.'.format(x_val=2, y_val=3))
+# Out: 'X value is: 2. Y value is: 3.'
+```
+
+Object attributes can be referenced when passed into `str.format`:
+```python
+class AssignValue(object):
+    def __init__(self, value):
+        self.value = value
+
+
+my_val = AssignValue(6)
+print('My value is: {0.value}'.format(my_val))  # "0" is optional
+# Out: 'My value is: 6'
+```
+
+Dictionary keys can be used as well:
+```python
+my_dict = {'key': 6, 'other_key': 7}
+print('My other key is: {0[other_key]}'.format(my_dict))  # "0" is optional
+# Out: 'My other key is: 7'
+```
+
+__Same applies to list and tuple__
+
+Note: In addition to `str.format`, Python also provides the modulo operator `%`
+-- also known as the string formatting or interpolation operator(see PEP 31011)
+-- for formatting strings. `str.format` is a successor of `%` and it offers 
+greater flexibility, for instance by making it easier to carry out multiple
+substitutions.
+
+In addition to argument indexes, you can also include a _format specification_
+inside the curly brackets. This is an expression that follows special rules and
+must be preceded by a colon(:). An example of format specification is the 
+alignment directive `:~^20` (^ stands for center alignment, total width 20, 
+fill with ~ character):
+```python
+'{:~^20}'.format('centered')
+# Out: '~~~~~centered~~~~~'
+```
+
+format allows behavior not possible with `%`, for example repetition of 
+arguments:
+```python
+t = (12, 45, 22, 103, 6)
+print('{0} {2} {1} {2} {3} {2} {4} {2} '.format(*t))
+# Out: 12 22 45 22 103 22 6 22
+```
+
+As format is a function, it can be used as an argument in other functions:
+```python
+number_list = [12, 45, 78]
+print(map('the number is {}'.format, number_list))
+# Out: ['the number is 12', 'the number is 45', 'the number is 78'] 
+```
+
+```python
+from datetime import datetime, timedelta
+
+once_upon_a_time = datetime(2020, 5, 25, 11, 5, 0, 0)
+delta = timedelta(days=3, hours=8, minutes=20)
+
+gen = (once_upon_a_time + x * delta for x in xrange(5))
+
+print('\n'.join(map('{:%Y-%m-%d %H:%M:%S}'.format, gen)))
+# Out:
+# 2020-05-25 11:05:00
+# 2020-05-28 19:25:00
+# 2020-06-01 03:45:00
+# 2020-06-04 12:05:00
+# 2020-06-07 20:25:00 
+```
+
+
+
+### 40.2 Alignment and padding
+The format() method can be used to change the alignment of the string. You have
+to do it with a format expression of the form: `[fill_char][align_operator]
+[width]` where `align_operator` is one of:
+    - < forces the field to be left-aligned within width
+    - > forces the field to be right-aligned within width
+    - ^ forces the field to be centered within width.
+    - = forces the padding to be placed after the sign(numeric types only)
+
+`fill_char`(if omitted default is whitespace) is the character used for the 
+padding.
+```python
+'{:~<9s}, World'.format('Hello')
+# 'Hello~~~~, World'
+
+'{:~>9s}, World'.format('Hello')
+# '~~~~Hello, World'
+
+'{:~^9s}, World'.format('Hello')
+# '~~Hello~~, World'
+
+'{:0=6d}'.format(-123)
+# '-00123'
+```
+
+
+
+### 40.3 Format literals(f-string)
+Literal format strings were introduced in PEP 498(Python 3.6 and upwards), 
+allowing you to prepend `f` to the beginning of a string literal to effectively
+apply `.format` to it with all variables in the current scope.
+```python
+foo = 'bar'
+f'Foo is {foo}'
+'Foo is bar'
+
+
+# This works with more advanced format strings too, including alignment and dot
+# notation.
+
+f'{foo:^7s}'
+'  bar  '
+```
+__Note__: The f'' does not denote a particular type like b'' for bytes or u''
+for `unicode` in python2. The formatting is immediately applied, resulting in
+a normal string.
+
+The format string can also be _nested_:
+```python
+price = 478.23
+f"{f'${price:0.2f}':*>20s}"
+# '*************$478.23'
+```
+
+The expressions in an f-string are evaluated in left-to-right order. This is
+detectable only if the expressions have side effects:
+```python
+def fn(l, incr):
+    result = l[0]
+    l[0] += incr
+    return result
+
+lst = [0]
+f'{fn(lst, 2)} {fn(lst, 3)}'
+# '0 2'
+
+f'{fn(lst, 2)} {fn(lst, 3)}'
+# '5 7'
+
+print(lst)
+#[10]
+```
+
+
+
+### 40.4 Float formatting 
+```bash
+>>> '{0:.0f}'.format(42.12345}
+'42'
+
+>>> '{0:.1f}'.format(42.12345}
+'42.1'
+
+>>> '{0:.3f}'.format(42.12345}
+'42.123'
+
+>>> '{0:.5f}'.format(42.12345}
+'42.12345'
+
+>>> '{0:.7f}'.format(42.12345}
+'42.1234500'
+```
+
+Same hold for other way of referencing
+```python
+>>> '{0:.3f}'.format(42.12345}
+'42.123'
+
+>>> '{answer:.3f}'.format(answer=42.12345}
+'42.123'
+```
+
+Floating point numbers can also be formatted in `scientific notation` or as
+percentages:
+```python
+>>> '{answer:.3e}'.format(answer=42.12345}
+'4.212e+01'
+
+>>> '{answer:.0%}'.format(answer=42.12345}
+'4212%'
+```
+
+You can also combine the {0} and {name} notations. This is especially useful 
+when you want to round all variables to a pre-specified number of decimals with
+1 _declaration_:
+```python
+>>>  s = 'Hello'
+>>> a, b, c = 1.12345, 2.34567, 3.45678
+>>> digits = 2
+
+>>> '{0}! {1:.{n}f}, {2:.{n}f}, {3:.{n}f}'.format(s, a, b, c, n=digits) 
+'Hello! 1.12, 2.35, 34.57'
+```
+
