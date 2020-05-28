@@ -1934,3 +1934,187 @@ when you want to round all variables to a pre-specified number of decimals with
 'Hello! 1.12, 2.35, 34.57'
 ```
 
+
+
+### 40.5 Named placeholders
+Format strings may contain named placeholders that are interpolated using 
+keyword arguments to `format`.
+__using a dictionary (Python 2.x)__
+```python
+>>> data = {'first': 'Hodor', 'last': 'Hodor!'}
+>>> '{first} {last}'.format(**data)
+'Hodor Hodor!'
+```
+
+__using a dictionary (Python 3.2+)__
+```python
+>>> '{first} {last}'.format_map(data)
+'Hodor Hodor!'
+```
+
+`str.format_map` allows to use dictionaries without having to unpack them 
+first. Also the class of data(which might be a custom type) is used instead of
+a newly filled `dict`.
+
+__without a dictonary__
+```python
+>>> '{first} {last}'.format(first='Hodor', last='Hodor!')
+'Hodor Hodor!'
+```
+
+
+
+### 40.6 String formatting with datatime
+Any class can configure its own string formatting syntax through the 
+`__format__` method. A type in the standard Python library that makes handy use
+of this is the `datetime` type, where one can use `strftime-like` formatting 
+codes directly within `str.format`:
+```python
+>>> from datetime import datetime
+>>> 'Chinese: {dt:%m/%d/%Y}.  ISO: {dt:%Y-%m-%d}.'.format(dt=datetime.now())
+'Chinese: 05/28/2020.  ISO: 2020-05-28.'
+```
+
+
+
+### 40.7 Formatting Numerical Values
+The `.format()` method can interpret a number in different formats, such as:
+```python
+>>> '{:c}'.format(65)  # Unicode character
+'A'
+
+>>> '{:d}'.format(0x0a)  # base 10
+'10'
+
+>>> '{:n}'.format(0x0a)  # base 10 using current locale for separators
+'10'
+```
+
+Format integers to different bases(hex, oct, binary)
+```python
+>>> '{:x}'.format(10)  # base 16, lowercase - Hexadecimal
+'a'
+
+>>> '{:X}'.format(10)  # base 16, uppercase - Hexadecimal
+'A'
+
+>>> '{:o}'.format(10)  # base 8, Octal
+'12'
+
+>>> '{:b}'.format(10)  # base 2, Binary
+'1010'
+
+>>> '{0:#b}, {0:#o}, {0:#x}'.format(42)  # with prefix 
+'0b101010, 0o52, 0x2a'
+
+>>> '8 bit: {0:08b}; Three bytes: {0:06x}'.format(42)  # Add zero padding
+'8 bit: 00101010; Three bytes: 00002a'
+```
+
+Using formatting to convert an RGB float tuple to a color hex string:
+```python
+>>> r,g,b = (1.0, 0.4, 0.0)
+>>> '#{:02X}{:02X}{:02X}'.format(int(255*r), int(255*g), int(255*b))
+'#FF6600'
+```
+
+Only integers can be converted
+```python
+>>> '{:x}'.format(42.0)
+ValueError: Unknown format code 'x' for object of type 'float'
+```
+
+
+
+### 40.8 Nested formatting
+Some formats can take additional parameters, such as the width of the formatted
+string, or the alignment:
+```python
+>>> '{:.>10}'.format('foo')
+'.......foo'
+```
+
+Those can also be provided as parameters to format by nesting more {} inside {}:
+```python
+>>> '{:.>{}}'.format('foo', 10)
+'.......foo'
+
+>>> '{:{}{}{}}'.format('foo', '*', '^', 15)
+'******foo******'
+```
+
+This can be useful in cases when parameters are not known beforehand, for 
+instances when aligning tabular data:
+```python
+>>> data = ["a", "bbbbbbb", "ccc"]
+>>> m = max(map(len, data))
+>>> for d in data:
+...     print('{:>{}}'.format(d, m))
+      a
+bbbbbbb
+    ccc
+```
+
+
+
+### 40.9 Format using Getitem and Getattr
+Any data structure that supports `__getitem__` can have their nested structure
+formatted:
+```python
+person = {'first': 'Arthur', 'last': 'Dent'}
+'{p[first]} {p[last]}'.format(p = person)
+# 'Arthur Dent'
+```
+
+Object attributes can be accessed using `getattr()`:
+```python
+class Person(object):
+    first = 'Zaphod'
+    last = 'Beeblebrox'
+
+'{p.first} {p.last}'.format(p = Person())
+# 'Zaphod Beeblebrox'
+```
+
+
+
+### 40.10 Padding and truncating strings, combined
+Say you want to print variables in a 3 character column.
+
+Note: doubling { and } escape them.
+```python
+s = """"
+
+pad
+{{:3}}      :{a:3}:
+
+truncate
+{{:.3}}     :{e:.3}:
+
+combined
+{{:>3.3}}   :{a:>3.3}:
+{{:3.3}}    :{a:3.3}:
+{{:3.3}}    :{c:3.3}:
+{{:3.3}}    :{e:3.3}:
+"""
+
+print(s.format(a='1'*1, c='3'*3, e='5'*5))
+# Out:
+pad
+{:3}      :1  :
+
+truncate
+{:.3}     :555:
+
+combined
+{:>3.3}   :  1:
+{:3.3}    :1  :
+{:3.3}    :333:
+{:3.3}    :555:
+```
+
+
+
+### 40.11 Custom formatting for a class
+
+
