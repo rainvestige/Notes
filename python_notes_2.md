@@ -2116,5 +2116,161 @@ combined
 
 
 ### 40.11 Custom formatting for a class
+For every value which is passed to the format function, Python looks for a
+`__format__` method to determine how the format function will display and 
+format your class and it's attributes.
 
+This is different than the `__str__` method, as in the `__format__` method you
+can take into account the formatting language, including alignment, field width
+etc, and even(if you wish) implement your own format specifiers, and your own
+format ting language extensions.
+```python
+object.__format__(self, format_spec)
+```
+
+For example:
+```python
+class Example(object):
+    def __init__(self, a, b, c):
+        self.a, self.b, self.c = a, b, c
+
+    def __format__(self, format_spec):
+        """ Implement special semantics for the 's' format specifier """
+        # reject anything that isn't an s
+        if format_spec[-1] != 's':
+            raise ValueError('{} format specifier not understood for this 
+                      object', format_spec[:-1])
+        # output in this example will be (<a>, <b>, <c>)
+        raw = '(' + ','.join([str(self.a), str(self.b), str(self.c)]) + ')' 
+        # Honor the format language by using the inbuilt string format
+        # Since we know the original format_spec ends in an 's'
+        # we can take advantage of the str.format method with a string 
+        # argument we constructed above.
+        return "{r:{f}}".format(r=raw, f=format_spec)
+
+
+instance = Example(1, 2, 3)
+print("{0:>20s}".format(instance)
+# Out:            (1,2,3)
+# Note how the right align and field width of 20 has been honored
+```
+
+__Note__ 
+
+In Python3, to pass your custom class to the format function, you will need 
+define `__format__` method on your own custom class.
+
+
+
+# Chapter 41: String Methods
+
+
+
+### 41.1 Changing the cpitalization of a string
+Python's string type provides many functions that act on the capitalization of 
+a string. These include:
+- str.casefold
+- str.upper
+- str.lower
+- str.capitalize
+- str.title
+- str.swapcase
+
+With unicode strings(the default in Python3), these operations are not 1:1 
+mappings or reversible. Most of these operations are intended for dispaly 
+purposes, rather than normalization.
+
+```python
+# Python 3.x
+str.casefold()
+```
+`str.casefold` creates a lowercase string that is suitable for case insensitive
+comparisons. This is more aggressive than `str.lower` and may modify strings
+that are already in lowercase or cause strings to grow in length, and is not
+intended  for dispaly purposes.
+```python
+"XßΣ".casefold()
+# 'xssσ'
+"XßΣ".lower()
+# 'xßς'
+```
+The transformations that take place under casefolding are defined by the 
+Unicode Consortium in the CaseFolding.txt file on their website.
+
+```python
+# str.upper()`
+# str.upper takes every character in a string and converts it to its uppercase
+# equivalent.
+
+# str.lower()
+# str.lower does the opposite; it takes every character in a string and 
+# converts it to its lowercase equivalent.
+
+# str.capitalize()
+# str.capitalize returns a capitalized version of the string, that is, it makes
+# the first character have upper case and the rest lower.
+
+# str.title()
+# str.title returns the title cased version of the string, that is, every 
+# letter in the beginning of a word is made upper case and all others are made
+# lower case:
+"this Is a 'String'".title()
+# "This Is A 'String'" 
+
+# str.swapcase()
+# str.swapcase returns a new string object in which all lower case characters
+# are swapped to upper case and all upper case characters to lower:
+"this iS A STRiNG".swapcase()
+# "THIS Is a strIng"
+```
+
+__Usage as str class methods__
+It is worth noting that these methods may be called either on string object(as
+shown above) or as a class method of the `str` class(with an explicit call to
+str.upper etc)
+```python
+str.upper('This is a string')
+# 'THIS IS A STRING'
+```
+
+This is more useful when applying one of these methods to many strings at once
+in say, a `map` function.
+```python
+map(str.upper, ["These", "are", "some", "strings"])
+# ["THESE", "ARE", "SOME", "STRINGS"]
+```
+
+
+
+### 41.2 str.translate: Translating characters in a string
+Python supports a translate method on the `str` type which allows you to 
+specify the translation table(used for replacements) as well as any characters
+which should be deleted in the process.
+
+str.translate(table[, deletechars])
+| Parameter   | Description                                                                 |
+|-------------|-----------------------------------------------------------------------------|
+| table       | It is a lookup table that defines the mapping from one character to another |
+| deletechars | A list of characters which are to be removed from the string.               |
+
+The maketrans method(str.maketrans in Python 3 and string.maketrans in Python2)
+allow you to generate a translation table.
+```python
+translation_table = str.maketrans('aeiou', '12345')
+my_string = "This is a string"
+translated = my_string.translate(translation_table)
+# "Th3s 3s 1 str3ng"
+```
+
+The translate method returns a string which is a translated copy of the 
+original string. You can set the table argument to None if you only need to
+delete characters.
+```python
+'this syntax is very useful'.translate(None, 'aeiou')
+# 'ths syntx s vry sfl'
+```
+
+
+
+### 41.3 str.format and f-strings: Format values into a string
 
