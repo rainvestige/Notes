@@ -6,7 +6,7 @@ snippet time "time"
 Time: `date '+%T'`
 endsnippet
 
-snippet '('|"|\`|<|\(|\[|\{)' "brackets" rw
+snippet '('|"|\`|<|\(|\[|\{|\$)' "brackets" rw
 `!p snip.rv = match.group(0)`${VISUAL}`!p 
 a = match.group(0).strip()
 if a == "<": snip.rv = ">"

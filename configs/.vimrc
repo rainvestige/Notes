@@ -73,7 +73,7 @@ set autoindent
 "------------------------------------------------------------"
 " Convert word to Uppercase
 inoremap <C-u> <esc>gUiwea
-inoremap <C-j> <esc>bgUlea
+inoremap <C-j> <esc>guiwgUlea
 "------------------------------------------------------------"
 " Plugins will be downloaded under the specified directory.
 call plug#begin('~/.vim/plugged')
@@ -126,10 +126,11 @@ call plug#end()
 "== colorscheme setting
 "==
 syntax enable
-set background=light
-let g:solarized_termcolors=256
-let g:solarized_termtrans=0
-let g:solarized_visibility="high"
+set background=dark
+call togglebg#map("<F5>")
+let g:solarized_termcolors=16
+let g:solarized_termtrans=1
+let g:solarized_visibility="normal"
 colorscheme solarized
 
 "==  
@@ -262,6 +263,9 @@ let g:vimtex_quickfix_latexlog = {
     \ },
     \}
 
+let g:vimtex_quickfix_ignore_filters = [
+      \ 'Unused global option',
+      \]
 
 " ==
 " == UltiSnips

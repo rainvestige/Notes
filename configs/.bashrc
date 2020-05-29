@@ -163,3 +163,6 @@ alias sudo='sudo env PATH=$PATH'
 # shut up the bell
 #setterm -blength 0
 xset -b
+
+# set Application path 
+export PATH=$PATH:/home/xy/Applications
