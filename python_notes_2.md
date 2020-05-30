@@ -2273,4 +2273,131 @@ delete characters.
 
 
 ### 41.3 str.format and f-strings: Format values into a string
+Python provides string interpolation and formatting functionality through the 
+`str.format` function, introduced in version 2.6 and f-strings introduced in 
+version 3.6
+
+Given the following variables
+```python
+i = 10
+f = 1.5
+s = 'foo'
+l = ['a', 1, 2]
+d = {'a': 1, 2: 'foo'}
+```
+
+The following statements are all equivalent
+```python
+"10 1.5 foo ['a', 1, 2] {'a': 1, 2: 'foo'}"
+>>> "{} {} {} {} {}".format(i, f, s, l, d)
+>>> str.format("{} {} {} {} {}", i, f, s, l, d)
+>>> "{0} {1} {2} {3} {4}".format(i, f, s, l, d)
+>>> "{0:d} {1:0.1f} {2} {3!r} {4!r}".format(i, f, s, l, d)
+>>> "{i:d} {f:0.1f} {s} {l!r} {d!r}".format(i=i, f=f, s=s, l=l, d=d)
+>>> f"{i} {f} {s} {l} {d}"
+>>> f"{i:d} {f:0.1f} {s} {l!r} {d!r}"
+```
+
+For reference, Python also supports C-style qualiﬁers for string formatting. 
+The examples below are equivalent to those above, but the `str.format` version
+are preferred due to benefits in flexibility, consistency of notation, and
+extensibility:
+```python
+"%d %0.1f %s %r %r" % (i, f, s, l, d)
+"%(i)d %(f)0.1f %(s)s %(l)r %(d)r" % (i=i, f=f, s=s, l=l, d=d)
+```
+
+The braces uses for interpolation in `str.format` can also be numbered to 
+reduce duplication when formatting strings. For example, the following are
+equivalent:
+```python
+"I am from Australia. I love cupcakes from Australia!"
+>>> "I am from {}. I love cupcakes from {}!".format("Australia", "Australia")
+>>> "I am from {0}. I love cupcakes from {0}!".format("Australia")
+```
+
+While the oﬃcial python documentation is, as usual, thorough enough, 
+pyformat.info has a great set of examples with detailed explanations.
+
+Additionally, the { and } characters can be escaped by using double brackets:
+
+
+
+### 41.4 String module's useful constants
+Python's string module provides constants for string related operations. To use
+them, import the string module:
+```python
+>>> import string
+>>> string.ascii__letters
+'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+>>> string.ascii_lowercase
+'abcdefghijklmnopqrstuvwxyz'
+
+>>> string.ascii_uppercase
+'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+>>> string.digits
+'0123456789'
+
+>>> string.hexdigits
+'0123456789abcdefABCDEF'
+
+>>> string.octaldigits
+'01234567'
+
+>>> string.punctuation
+'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+
+>>> string.whitespace
+' \t\n\r\x0b\x0c'
+```
+
+
+
+### 41.5 Stripping unwanted leading/trailing characters from a string
+Three methods are provided that offer the ability to strip leading and trailing
+characters from a string: `str.strip, str.rstrip, str.lstrip`. All three 
+methods have the same signature and all three return a new string object with
+unwanted characters removed.
+
+```
+str.strip([chars])
+```
+`str.strip` acts on a given string and removes(strips) any leading or trailing
+characters contained in the argument chars; if chars is not supplied or is 
+None, all white space characters are removed by defaul. For example:
+```python
+>>> "    a line with leading and trailing space     ".strip()
+'a line with leading and trailing space'
+```
+If chars is supplied, all characters contained in it are removed from the 
+string, which is returned. FOr example:
+```python
+>>> ">>> a Python prompt".strip('> ')  # strips '>' character and space character
+'a Python prompt'
+```
+
+__str.rstrip([chars[) and str.lstrip([chars[)__
+
+These methods have similar semantics and arguments with `str.strip()`, their
+difference lies in the direction from which they start. `str.rstrip()` starts
+from the end of the string while `str.lstrip()` splits from the start of the
+string.
+
+For example, using `str.rstrip`:
+```python
+>>> "     spacious string        ".rstrip()
+"     spacious string"
+```
+
+While, using `str.lstrip`:
+```python
+>>> "     spacious string        ".lstrip()
+"spacious string        "
+```
+
+
+
+### 41.6 Reversing a string
 
