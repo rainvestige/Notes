@@ -2400,4 +2400,161 @@ While, using `str.lstrip`:
 
 
 ### 41.6 Reversing a string
+A string can reversed using the built-in `reversed()` function, which takes a 
+string and returns an iterator in reverse order.
+```python
+>>> reversed('hello')
+<reversed object at 0x...>
+>>> [char for char in reversed('hello')]
+['o', 'l', 'l', 'e', 'h']
+```
 
+`reversed()` can be wrapped in a call to `''.join()` to make a string from the
+iterator.
+```python
+>>> ''.join(reversed('hello'))
+'olleh'
+```
+
+While using `reversed()` might be more readable to uninitiated Python users, 
+using extended slicing with a step of -1 is faster and more concise.
+```python
+>>> def reversed_string(main_string):
+...     return main_string[::-1]
+...
+>>> reversed_string('hello')
+'olleh'
+```
+
+
+
+### 41.7 Split a string based on a delimiter into a list of strings
+__str.split(sep=None, maxsplit=-1)__
+
+`str.split` takes a string and returns a list of substrings of the original
+string. The behavior differs depending on whether the sep arguments is provided
+or omitted.
+
+If sep isn't provided, or is None, then the splitting takes place wherever 
+there is whitespace. However, leading and trailing whitespace is ignored, and
+multiple consecutive whitespace characters are treated the same as a single
+whitespace character:
+```python
+>>> "This is a sentence.".split()
+['This', 'is', 'a', 'sentence.']
+
+>>> " This is    a sentence.  ".split()
+['This', 'is', 'a', 'sentence.']
+
+>>> "               ".split()
+[]
+```
+
+The sep parameter can be used to define a delimiter string. The original string 
+is split where the delimiter string occurs, and the delimiter itself is 
+discarded. Multiple consecutive delimiters are not treated the same as a single
+occurrence, but rather cause empty strings to be created.
+```python
+>>> "This is a sentence.".split(' ')
+['This', 'is', 'a', 'sentence.']
+>>> "Earth,Stars,Sun,Moon".split(',')
+['Earth', 'Stars', 'Sun', 'Moon']
+>>> " This is
+a sentence. ".split(' ')
+['', 'This', 'is', '', '', '', 'a', 'sentence.', '', '']
+>>> "This is a sentence.".split('e')
+['This is a s', 'nt', 'nc', '.']
+>>> "This is a sentence.".split('en')
+['This is a s', 't', 'ce.']
+```
+
+The default is to split on every occurrence of the delimiter, however the 
+maxsplit parameter limits the number of splittings that occur. The default 
+value of -1 means no limit:
+```python
+>>> "This is a sentence.".split('e', maxsplit=0)
+['This is a sentence.']
+>>> "This is a sentence.".split('e', maxsplit=1)
+['This is a s', 'ntence.']
+>>> "This is a sentence.".split('e', maxsplit=2)
+['This is a s', 'nt', 'nce.']
+>>> "This is a sentence.".split('e', maxsplit=-1)
+['This is a s', 'nt', 'nc', '.']
+```
+
+__str.rsplit(sep=None, maxsplit=-1)__
+`str.rsplit`("right split") differs from `str.split`("left split") when 
+maxsplit is specified. The splitting starts at the ending of the string rather
+that at the beginning:
+```python
+>>> "This is a sentence.".rsplit('e', maxsplit=1)
+['This is a sentenc', '.']
+>>> "This is a sentence.".rsplit('e', maxsplit=2)
+['This is a sent', 'nc', '.']
+```
+
+
+
+### 41.8 Replace all occurrences of one substring with another substring
+
+__str.replace(old, new[, count])__
+
+`str.replace` takes two arguments old and new containing the old substring 
+which is to be replaced by the new substring. The optional argument count
+specifies the number of replacements to be made:
+```python
+>>> "Make sure to foo your sentence.".replace('foo', 'spam')
+"Make sure to spam your sentence."
+```
+
+If the given string contains multiple examples that match the old argument, all 
+occurrences are replaced with the value supplied in new:
+```python
+>>> "It can foo multiple examples of foo if you want.".replace('foo', 'spam')
+"It can spam multiple examples of spam if you want."
+```
+unless, of course, we supply a value for count.
+
+
+
+### 41.9 Testing what a string is composed of
+Python's str type also features a number of methods that can be used to 
+evaluate the contents of a string. These are `str.isalpha, str.isdigit, 
+str.isalnum, str.isspace.` Capitalization can be tested with `str.isupper,
+str.islower and str.istitle`.
+
+__str.isalpha__
+
+str.isalpha takes no arguments and returns True if the all characters in a given
+string are alphabetic, for example:
+```python
+>>> "Hello World".isalpha()  # contains a space
+False
+>>> "Hello2World".isalpha()  # contains a number
+False
+>>> "HelloWorld!".isalpha()  # contains punctuation
+False
+>>> "HelloWorld".isalpha()
+True
+```
+
+As an edge case, the empty string evaluates to False when used with "".isalpha() .
+
+__str.isupper , str.islower , str.istitle__
+
+These methods test the capitalization in a given string.
+
+str.isupper is a method that returns True if all characters in a given string 
+are uppercase and False otherwise.
+```python
+>>> "HeLLO WORLD".isupper()
+False
+>>> "HELLO WORLD".isupper()
+True
+>>> "".isupper()
+False
+```
+
+
+
+### 41.10 String contains
