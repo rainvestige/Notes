@@ -111,3 +111,15 @@ can be put in a script file for reuse
     UUID=CCBA2722BA270912                     /media/windows       ntfs    uid=1000,gid=1000,fmask=007,dmask=007   0       0
     ```
     You only need to change the UUID and `/media/windows`
+
+
+
+# Disk Usage
+
+```bash
+du [OPTION]... [FILE]...
+
+du -sh  # 查询当前目录总大小
+
+du -h -d 1 *
+```
