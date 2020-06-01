@@ -2558,3 +2558,140 @@ False
 
 
 ### 41.10 String contains
+Python makes it extremely intuitive to check if a string contains a given 
+substring. Just use the in operator:
+```python
+>>> 'foo' in 'foo.baz.bar'
+True
+```
+
+Note: testing an empty string will always result in True
+```python
+>>> '' in 'test'
+True
+```
+
+
+
+### 41.11 Join a list of strings into one string
+A string can be used as a separator to join a list of strings together into a
+single string using the `join()` method. For example you can create a string
+where each element in a list is separated by a space.
+```python
+>>> ' '.join(['once', 'upon', 'a', 'time'])
+"once upon a time"
+```
+
+The following example separates the string elements with three hyphens.
+```python
+>>> '---'.join(['once', 'upon', 'a', 'time'])
+"once---upon---a---time"
+```
+
+
+
+### 41.12 Counting number of times a substring appears in a string
+One method is available for counting the number of occurrences of a sub-string
+in another string, `str.count`.
+
+`str.count(sub[, start[, end]])`
+
+`str.count` returns an int indicating the number of non-overlapping occurrences
+of the sub-string `sub` in another string. The optional arguments `start` and 
+`end` indicate the beginning and the end in which the search will take place.
+By default `start = 0` and `end = len(str)` meaning the whole string will be
+searched:
+```python
+>>> s = "She sells seashells by the seashore."
+>>> s.count("sh")
+2
+>>> s.count("se")
+3
+>>> s.count("sea")
+2
+>>> s.count("seashells")
+1
+```
+
+By specifying a different value for start , end we can get a more localized 
+search and count, for example, is start is equal to 13 the call to:
+```python
+>>> s.count('sea', start=13)
+1
+```
+
+
+
+### 41.13 Case insensitive string comparisons
+Comparing string in a case insensitive way seems like something that's trivial,
+but it's not. This section only considers unicode strings(the default in 
+Python3). Note that Python2 may have subtle weaknesses relative to Python 3 - 
+the later's unicode handling is much more complete.
+
+The first thing to note it that case-removing conversions in unicode aren't 
+trivial. There is text for which `text.lower() != text.upper().lower()`, such 
+as "ß":
+```python
+
+>>> "ß".lower()
+'ß'
+>>> "ß".upper().lower()
+'ss'
+```
+
+But let's say you wanted to caselessly compare "BUSSE" and "Buße". You probably
+also want to compare "BUSSE" and "BUßE" equal - that's teh newwe capital form.
+The recommended way is to use `casefold`:
+```python
+>>> help(str.casefold)
+"""
+Help on method_descriptor:
+
+casefold(...)
+    S.casefold() -> str
+    
+    Return a version of S suitable for caseless comparisons.
+"""
+```
+
+Do not just use `lower`. If `casefold` is not available, doing 
+`.upper().lower()` helps(but only somewhat). Then you should consider accents.
+if your font renderer is good, you probably think `"ê" == "ê"` - but it 
+doesn't:
+```python
+>>> "ê" == "ê"
+False
+```
+
+This is because they are actually
+```python
+>>> import unicodedata
+>>> [unicodedata.name(char) for char in "ê"]
+['LATIN SMALL LETTER E WITH CIRCUMFLEX']
+
+>>> [unicodedata.name(char) for char in "ê"]
+['LATIN SMALL LETTER E', 'COMBINING CIRCUMFLEX ACCENT']
+```
+
+The simplest way to deal with this is `unicodedata.normalize`. You probably 
+want to use __NFKD__ normalization, but feel free to check the documentation.
+Then one does
+```python
+>>> unicodedata.normalize("NFKD", "ê") == unicodedata.normalize("NFKD", "ê")
+True
+```
+
+To finish up, here this is expressed in functions:
+```python
+import unicodedata
+
+def normalize_caseless(text):
+    return unicodedata.normalize("NFKD", text.casefold())
+
+def caseless_equal(left, right):
+    return normalize_caseless(left) == normalize_caseless(right)
+```
+
+
+
+### 41.14 Justify strings
