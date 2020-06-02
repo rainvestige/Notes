@@ -85,3 +85,6 @@ make && sudo make install
     [Slove UltiSnips and YouCompleteMe \<tab> mapping collision](
     https://stackoverflow.com/questions/14896327/ultisnips-and-youcompleteme)
 
+
+# Custom workspace
+mksession [filename]
