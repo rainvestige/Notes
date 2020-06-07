@@ -2695,3 +2695,510 @@ def caseless_equal(left, right):
 
 
 ### 41.14 Justify strings
+Python provides functions for justigying strings, enabling text padding to make
+aligning various strings much easier. Below is an example of `str.ljust` and
+`str.rjust`:
+```python
+interstates_length = {
+    5: (1381, 2222),
+    19: (63, 102),
+    40: (2555, 4112),
+    93: (189, 305),
+}
+
+for road, length in interstates_lengths.items():
+    miles, kms = length
+    print('{} -> {} mi. ({}km.)'.format(str(road).rjust(4), str(miles).ljust(4),
+          str(kms).ljust(4)))
+
+# 40 -> 2555 mi. (4112 km.)
+# 19 -> 63   mi. (102  km.)
+# 5  -> 1381 mi. (2222 km.)
+# 93 -> 189  mi. (305  km.)
+```
+
+ljust and rjust are very similar. Both have a width parameter and an optional 
+fillchar parameter. Any string created by these functions is at least as long
+as the width parameter that was passed into the function. If the string is 
+longer that width alread, it is not truncated. The fillchar argument, which
+defaults to the space character ' ' must be a single character, not a 
+multicharacter string.
+
+The ljust function pads the end of the string it is called on with the fillchar
+until it is width characters long. Therefore, the `l and r` in the names of 
+these functions refer to the side that the original string, not the fillchar, 
+is positioned in the output string.
+
+
+
+### 41.15 Test the starting and ending characters of a string
+In order to test the beginning and ending of a given string in Python, one can
+use the methods `str.startswith() and str.endswith()`.
+
+`str.startswith(prefix[, start[, end]])`
+
+As its name implies, `str.startswith` is used to test whether a given string
+starts with the given characters in prefix.
+```python
+>>> s = 'This is a test string'
+>>> s.startswith('T')
+True
+>>> s.startswith('Thi')
+True
+>>> s.startswith('thi')
+False
+```
+
+The optional arguments start and end specify the start and end points from 
+which the testing will start and finish. In the following example, by specify
+a start value of 2 our string will be searched from position 2 and afterwards:
+```
+>>> s.startswith('is', 2)
+True
+>>> s[2]
+'i'
+>>> s[3]
+'s'
+```
+
+You can also use a `tuple` to check if it starts with any of a set of strings
+```python
+>>> s.startswith(('This', 'That'))
+True
+>>> s.startswith(('ab', 'cd'))
+False
+```
+
+`str.endswith(prefix[, start[, end]])`
+
+str.endswith is exactly similar to `str.startswith` with the only difference
+being that it searches for ending characters and not starting characters.
+```
+>>> s = "this ends in a full stop."
+>>> s.endswith('.')
+True
+>>> s.endswith('!')
+False
+```
+
+as with startswith more than one characters can used as the ending sequence:
+```
+>>> s.endswith('stop.')
+True
+>>> s.endswith('Stop.')
+False
+```
+
+You can also use a tuple to check if it ends with any of a set of strings
+```
+>>> s.endswith(('.', 'something'))
+True
+>>> s.endswith(('ab', 'bc'))
+False
+```
+
+
+
+### 41.16 Conversion between str or bytes data and unicode characters
+The contents of files and network messages may represent encoded characters.
+They often need to be converted to unicode for proper display.
+
+In Python 2, you may need to convert str data to Unicode characters. The 
+default('', "", etc.) is an ASCII string, with any values outside of ASCII
+range displayed as escaped values. Unicode strings are u''(or u"", etc.)
+
+In Python 3, you may need to convert arrays of bytes(referred to as a 'byte 
+literal') to strings of Unicode characters. The default is now a Unicode 
+string, and bytestring literals must now be entered as b'', b"", etc. A byte
+literal will return True to `isinstance(some_val, byte)`, assuming `some_val`
+to be a string that might be encoded as bytes.
+```python
+>>> s = b'\xc2\xa9 abc'  # s is a byte array, not characters
+                         # In Python 3, the default string literal is Unicode;
+>>> s
+b'\xc2\xa9 abc'
+>>> s[0]
+194
+>>> type(s)
+<class 'bytes'>
+
+>>> u = s.decode('utf-8')# bytes.decode converts a byte array to a string(which
+                         # will, in Python 3, be Unicode)
+>>> u[0]
+'©'
+>>> type(u)
+<class 'str'>
+>>> u.encode('utf-8')
+b'\xc2\xa9 abc'
+```
+
+
+
+# Chapter 42: Using loops within functions
+In Python function will be returned as soon as execution hits "return" 
+statement.
+
+
+
+### 42.1 Return statement inside loop in a function
+```python
+def func(params):
+    for value in params:
+        print ('Got value {}'.format(value))
+        if value == 1:
+            # Returns from function as soon as value is 1
+            print (">>>> Got 1")
+            return
+        print('Still looping')
+    return "Couldn't find 1"
+
+
+func([5, 3, 1, 2, 8, 9])
+
+# Out:
+# Got value 5
+# Still looping
+# Got value 3
+# Still looping
+# Got value 1
+# >>>> Got 1
+```
+
+
+
+# Chapter 43: Importing modules
+
+
+
+### 43.1 Importing a module
+Use the `import` statement:
+```python
+>>> import random
+>>> print(random.randint(1, 10))
+4
+```
+
+`import` module will import a module and then allow you to reference its 
+objects -- values, functions and classes, for example -- using the module.name
+syntax. In the above example, the random module is imported, which contains the
+randint function. So by importing random you can call randint with 
+`random.randint`.
+
+You can import a module and assign it to a different name:
+```python
+>>> import random as rn
+>>> print(rn.randint(1, 10))
+4
+```
+
+
+If your python file main.py is in the __same folder__ as a custom.py. You can 
+import it like this:
+```python
+import custom
+```
+
+It is also possible to import a function from a module:
+```python
+>>> from math import sin
+>>> sin(1)
+0.8414709848078965
+```
+
+To import specific functions deeper down into a module, the dot operator may be
+used __only__ on the left side of the `import` keyword.
+```python
+from urllib.request import urlopen
+```
+
+In Python, we have two ways to call function from top level. One is import and
+another is from. We should use `import` when we have a possibility of name 
+collision. Suppose we have hello.py file and world.py files having same 
+function named function. The import statement will work good.
+```python
+from hello import function
+from world import function
+
+function()  # world's function will be invoked. Not hello's
+```
+
+In general import will provide you a namespace.
+```python
+import hello
+import world
+
+hello.function()
+world.function()
+```
+
+But if you are sure enough, in your whole project there is no way having same 
+function name you should use `from` statement
+
+Multiple imports can be made on the same line:
+```python
+# Multiple modules
+import time, sockets, random
+
+# Multiple functions
+from math import sin, cos, tan
+
+# Multiple constants
+from math import pi, e
+```
+
+The keywords and syntax shown above can also be used in combinations:
+```python
+from urllib.request import urlopen as geturl, pathname2url as path2url, getproxies
+from math import fatorial as fact, gamma, atan as arctan
+import random.randint, time, sys
+```
+
+
+
+### 43.2 The `__all__` special variable
+Modules can have a special variable named `__all__` to restrict what variables
+are imported when using `from module import *`
+
+Given the following module:
+```python
+# mymodule.py
+__all__ = ['imported_by_star']
+
+imported_by_star = 42
+not_imported_by_star = 21
+```
+
+Only `imported_by_star` is imported when using `from module import *`:
+```python
+>>> from mymodule import *
+>>> imported_by_star
+42
+>>> not_imported_by_star
+NameError: name 'not_imported_by_star' is not defined
+```
+
+However, `not_imported_by_star` can be imported explicitly:
+```python
+>>> from mymodule import not_imported_by_star
+>>> not_imported_by_star
+21
+```
+
+
+
+### 43.3 Import modules from an arbitrary filesystem location
+If you want to import a module that doesn't already exist as a built-in module
+in the `Python Standard Library' nor as a side-package, you can do this by
+adding the path to the directory where your module is found to `sys.path`. This
+may be useful where multiple python environments exist on a host.
+
+```python
+import sys
+sys.path.append('/path/to/directory/containing/your/module')
+import mymodule
+```
+
+It is important that you append the path to the `directory` in which `mymodule`
+is found, not the path to the module itself.
+
+
+
+### 43.4 Importing all names from a module
+
+```
+from module_name import *
+```
+
+For example:
+```python
+from math import *
+sqrt(2)  # instead of math.sqrt(2)
+ceil(2.7)# instead of math.ceil(2.7)
+```
+
+This will import all names defined in the math module into the global 
+namespace, other than names that begins with an underscore(which indicates that
+the writer feels that it is for internal use only).
+
+__Warning__: if a function with the same name was already defined or imported, 
+it will be overwritten. Almost always importing only specific names `from math
+import sqrt, ceil` is the recommended way.
+
+Starred imports are only allowed at the module level. Attempts to perform them
+in class or function definitions result in a `SyntaxError`.
+
+
+
+### 43.5 Programmatic importing
+To import a module through a function call, use the `importlib` module(included
+in Python starting in version 2.7):
+```python
+import importlib
+random = importlib.import_module('random')
+```
+
+The `importlib.import_module()` function will also import the submodule of a 
+package directly:
+```python
+>>> collections_abc = importlib.import_module('collections.abc')
+```
+
+
+
+### 43.6 PEP8 rules for Imports
+Some recommended style guidelines for imports
+
+
+
+### 43.7 Importing specific names from a module
+Instead of  importing the complete module you can import only specified names:
+```python
+from random import randint  # Syntax "from MODULENAME import 
+                            # Name1[, NAME2[, ...]]"
+print(randint(1, 10))
+```
+
+`from random` is needed, because the python interpreter has to kenow from which
+resource it should import a function or class and `import` randint specifies
+the function or class itself.
+
+The following example will raise an error, because we haven't imported a module:
+```python
+random.randrange(1, 10)  # works only if "import random" has been run before
+# Outputs:
+# NameError: name 'random' is not defined
+```
+
+The python interpreter does not understand what you mean with random. It needs 
+to be declared by adding `import random` to the example:
+```python
+import random
+random.randrange(1, 10)
+```
+
+
+
+### 43.8 Importing submodules
+```python
+from module.submodule import function
+```
+
+This imports function from module.submodule
+
+
+
+### 43.9 Re-importing a module
+When using the interactive, you might want to reload a module. This can be 
+useful if you're editing a module and want to import the newest version, or if
+you've monkey-patched an element of an existing module and want to revert your
+changes.
+
+```python
+import math
+math.pi = 3
+print(math.pi)  # 3
+import math
+print(math.pi)  # 3
+```
+
+This is because the interpreter registers every module you import. And when you
+try to reimport a module, the interpreter sees it in the register and does 
+nothing. So the hard way to reimport is to use import after removing the 
+corresponding item from the register:
+```
+>>> if 'math' in sys.modules:
+...     del sys.modules['math']
+... 
+>>> print(math.pi)
+3
+>>> import math
+>>> print(math.pi)
+3.141592653589793
+```
+
+But there is more a straightforward and simple way.
+
+__Python 3__
+```
+import math
+math.pi = 3
+print(math.pi)  # 3
+from importlib import reload
+reload(math)
+print(math.pi)  # 3.14159265358973
+```
+
+
+
+### 43.10 `__import__()` function
+The `__import__()` function can be used to import modules where the name is 
+only known at runtime
+```python
+if user_input == 'os':
+    os = __import__('os')
+# equivalent to import os
+
+# This function can also be used to specify the file path to a module
+mod = __import__(r"/path/to/file/anywhere/on/computer/module.py")
+```
+
+
+
+# Chapter 44: Difference between Module and Package
+
+### 44.1 Modules
+A module is a single Python file that can be imported. Using a module looks 
+like this:
+```python
+# module.py
+def hi():
+    print('Hello world!')
+```
+
+```python
+# my_script.py
+import module
+module.hi()
+```
+
+in an interpreter
+```python
+>>> from module import hi
+>>> hi()
+# Hello world!
+```
+
+
+
+### 44.2 Packages
+A package is made up of multiple Python file(or modules), and can even include
+libraries written in C or C++. Instead of being a single file, it is an entire
+folder structure which might look like this:
+
+Folder package
+- `__init__.py`
+- dog.py
+- hi.py
+
+`__init__.py`
+```python
+from package.dog import woof
+from package.hi import hi
+```
+
+dog.py
+```python
+def woof():
+    print('WOOF!!!')
+```
+
+hi.py
+```python
+def hi():
+    print('Hello world!')
+```
+
+All Python packages must contain an `__init__.py` file. When you import a 
+package in your script(import package), the `__init__.py` script will be run,
+giving you access to the all of the functions in the package. In this case, it
+allows you to use the `package.hi` and `package.woof` functions.
