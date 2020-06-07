@@ -166,3 +166,7 @@ xset -b
 
 # set Application path 
 export PATH=$PATH:/home/xy/Applications
+
+
+# tmux setting
+export TERM=xterm-256color

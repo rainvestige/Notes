@@ -113,6 +113,9 @@ Plug 'lervag/vimtex'
 Plug 'SirVer/ultisnips'
 Plug 'ervandew/supertab'
 
+" tmuxline
+Plug 'edkolev/tmuxline.vim'
+
 " List ends here. Plugins become visible to Vim after this call.
 call plug#end()
 
