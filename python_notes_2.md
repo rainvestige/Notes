@@ -3202,3 +3202,761 @@ All Python packages must contain an `__init__.py` file. When you import a
 package in your script(import package), the `__init__.py` script will be run,
 giving you access to the all of the functions in the package. In this case, it
 allows you to use the `package.hi` and `package.woof` functions.
+
+
+
+# Chapter 88: Exceptions
+Errors detected during execution are called exceptions and are not 
+unconditionally fatal. Most exceptions are not handled by programs; it is
+possible to write programs that handle selected exceptions. There are specific
+features in Python to deal with exceptions and exception logic. Furthermore,
+exceptions have a rich type hierarchy, all inheriting from the BaseException
+type.
+
+
+
+### 88.1 Catching Exceptions
+Use `try...except`: to catch exceptions. You should specify as precise an
+exception as you can:
+```python
+>>> try:
+...     x = 5 / 0
+... except ZeroDivisionError as e:
+...     # `e` is the exception object
+...     print("Got a divide by zero! The exception was:", e)
+...     # handle exceptional case
+...     x = 0
+... finally:
+...     print("The END")
+...     # it runs no matter what execute.
+...
+Got a divide by zero! The exception was: division by zero
+The END
+```
+
+The exception class that is specified - in this case, `ZeroDivisionError` - 
+catches any exception that is of that class or of any subclass of that 
+exception.
+
+For example, `ZeroDivisionError` is a subclass of `ArithmeticError`:
+```python
+>>> ZeroDivisionError.__bases__
+(<class 'ArithmeticError'>,)
+```
+
+And so, the following will still catch the `ZeroDivisionError`:
+```python
+try:
+    5 / 0
+except ArithmeticError:
+    print("Got arithmetic error")
+
+# Got arithmetic error
+```
+
+
+
+### 88.2 Do not catch everything!
+While it's often tempting to catch every Exception:
+```python
+try:
+    very_difficult_function()
+except Exception:
+    # log / try to reconnect / exit gratiously
+finally:
+    print('The END')
+```
+
+Or even everything(that includes BaseException and all its children including
+`Exception`):
+```python
+try:
+    even_more_difficult_function()
+except:
+    pass # do whatever needed
+```
+
+In most cases it's bad practice. It might catch more than intended, such as
+`SystemExit, KeyboardInterrupt and MemoryError` - each of which should 
+generally be handled differently than usual system or logic errors. It also 
+means there's no clear understanding for what the internal code may do wrong
+and how to recover properly from that condition. If you're catching every 
+error, you won't know what error occured or how to fix it.
+
+This is more commonly referred to as 'bug masking' and should be avoided. Let
+your program crash instead of silently failing or even worse, failing at deeper
+level of execution.(Imagine it's a transactional system)
+
+Usually these constructs are used at the very outer level of the program, and
+wil log the details of the error so that the bug can be fixed, or the error can
+be handled more specifically.
+
+
+
+### 88.3 Re-raising exceptions
+Sometimes you want to catch an exception just to inspect it, e.g. for logging
+purposes. After the inspection, you want the exception to continue propagating
+as it did before.
+
+In this case, simply use the `raise` statement with no parameters.
+```python
+>>> try:
+...     5 / 0
+... except ZeroDivisionError:
+...     print("got an error")
+...     raise
+... 
+got an error
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+ZeroDivisionError: division by zero
+```
+
+Keep in mind, though, that someone further up in the caller stack can still 
+catch the exception and handle it somehow. The done output could be a nuisance
+in this case because it will happen in any case(caught or not caught). So it
+might be a better idea to raise a different exception, containing your comment
+about the situation as well as the original exception:
+```python
+>>> try:
+...     5 / 0
+... except ZeroDivisionError as e:
+...     raise ZeroDivisionError("Got an error", e)
+...
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+ZeroDivisionError: division by zero
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<stdin>", line 4, in <module>
+ZeroDivisionError: ('Got an error', ZeroDivisionError('division by zero',))
+```
+
+But this has the drawback of reducing the exception trace to exactly this 
+`raise` while the `raise` without argument retains the original exception trace.
+
+In Python3 you can keep the original stack by using the raise-from syntax:
+```python
+raise ZeroDivisionError("Got an error") from e
+```
+
+
+
+### 88.4 Catching multiple exceptions
+
+
+
+### 88.9 Practical examples of exception handling
+
+__User input__
+
+Imagine you want a user to enter a number via `input`. You want to ensure the
+input is a number. You can use `try/except` for this:
+```python
+while True:
+    try:
+        nb = int(input('Enter a number'))
+        break
+    except ValueError:
+        print('This is not a number, try again.')
+```
+
+If the input could not be converted to an integer, a `ValueError` is raised. 
+You can catch it with `except`. If no exception is raised, break jumps out of
+the loop. After the loop, `nb` contains an integer.
+
+__Dictionaries__
+
+Imagine you are iterating over a list of consecutive integers, like `range(n)`,
+and you have a list of dictionaries `d` that contains information about things
+to do when you encounter some particular integers, say skip the `d[i]` next 
+ones.
+
+```python
+d = [{7: 3}, {25: 9}, {38: 5}]
+for i in range(len(d)):
+do_stuff(i)
+try:
+dic = d[i]
+i += dic[i]
+except KeyError:
+i += 1
+```
+
+A KeyError will be raised when you try to get a value from a dictionary for a
+key that doesn't exist.
+
+
+
+### 88.10 Exceptions are Objects too
+Exceptions are just regular Python objects that inherit from the built-in 
+BaseException. A Python script can use the `raise` statement to interrupt
+execution, causing Python to print a stack trace of the call stack at that 
+point and a representation of the exception instance. For instance:
+
+```python
+>>> def failing_function():
+...     raise ValueError('Example error!')
+... 
+>>> failing_function()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 2, in failing_function
+ValueError: Example error!
+```
+
+which says that a `ValueError` with the message ' Example error!' was raised by
+our `failing_function()`, which was executed in the interpreter.
+
+Calling code can choose to handle any and all types of exception that a call 
+can raise:
+```python
+>>> try:
+...     failing_function()
+... except ValueError:
+...     print('Handled the error')
+... 
+Handled the error
+```
+
+You can get hold of the exception objects by assigning them in the `except...`
+part of the exception handling code:
+```python
+>>> try:
+...     failing_function()
+... except ValueError as e:
+...     print('Caught exception', repr(e))
+... 
+Caught exception ValueError('Example error!',)
+```
+
+
+
+### 88.11 Running clean-up code with finally
+Sometimes, you may want something to occur regradless of whatever exception
+happened, for example, if you have to clean up some resources.
+
+The `finally` block of a `try` clause will happen regradless of whether any
+exceptions were raised.
+```python
+resource = allocate_some_expensive_resource()
+try:
+    do_stuff(resource)
+except SomeException as e:
+    log_error(e)
+    raise  # re-raise the error
+finally:
+    free_expensive_resource(resource)
+```
+
+This pattern is often better handled with context managers(using the `with` 
+statement).
+
+
+
+### 88.12 Chain exceptions with raise from
+In the process of handling an exception, you may want to raise another 
+exception. For example, if you get an `IOError` while reading from a file, you
+may want to raise an application-specific error to present to the users of your
+library, instead.
+
+You can chain exceptions to show how the handling of exceptions proceeded:
+```python
+>>> try:
+...     5 / 0
+... except ZeroDivisionError as e:
+...     raise ValueError('Division failed!') from e
+... 
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+ZeroDivisionError: division by zero
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<stdin>", line 4, in <module>
+ValueError: Division failed!
+```
+
+
+
+# Chapter 90: Commonwealth Exceptions
+Here in Stack Overflow we often see duplicates talking about the same errors:
+"ImportError: No module named '???', SyntaxError: invalid syntax or NameError:
+name '???' is not defined". This is an effort to reduce them and to have some
+documentation to link to.
+
+
+
+### 90.1 Other Errors
+
+__AssertError__
+
+The `assert` statement exists in almost every programming language. When you 
+do:
+
+`assert condition`
+
+or:
+
+`assert condition, message`
+
+It's equivalent to this:
+```python
+if __debug__:
+    if not condition: raise AssertionError(message)
+```
+
+Assertions can include an optional message, and you can disable them when 
+you're done debugging.
+
+Note: the built-in variable debug is True under normal circumstances, False 
+when optimization is requested(command line option -O). Assignments to debug
+are illegal. The value for the built-in variable is determined when the 
+interpreter starts.
+
+__KeyboardInterrupt__
+
+Error raised when the user presses the interrupt key, normally `Ctrl + C or del`
+
+__ZeroDivisionError__
+
+
+
+### 90.2 NameError: name '???' is not defined
+Is raised when you tried to use a vairable, method or function that is not 
+initialized(at least not before). In other words, it is raised when a requested
+local or global name is not found. It's possible that you misspelt the name of
+the object or forgot to `import` something. Also maybe it's in another scope. 
+We'll cover those with separate examples.
+
+- It's simply not defined nowhere in the code
+
+    It's possible that you forgot to initialize it, especially if it is a 
+    constant.
+    ```python
+    foo  # This variable is not defined
+    bar()  # This function is not defined
+    ```
+
+- Maybe it's defined later
+    
+    ```python
+    baz()
+
+    def baz():
+        pass
+    ```
+
+- Or it wasn't imported
+    ```python
+    # needs import math
+
+    def sqrt():
+        x = float(input('Value: '))
+        return math.sqrt(x)
+    ```
+
+- Python scopes and the LEGB Rule
+    
+    The so-called LEGB Rule talks about the Python scopes. Its name is based on
+    the different scopes, ordered by the correspondent priorities:
+
+    `Local -> Enclosed -> Global -> Built-in`
+
+    * Local: Variables not declared global or assigned in a function.
+    * Enclosing: Variables defined in a function that is wrapped inside another
+        function.
+    * Global: Variables declared global, or assigned at the top-level of a file
+    * Built-in: Variables preassigned in the built-in names module.
+
+    ```python
+    for i in range(5):
+        d = i * 2
+    print(d)
+    ```
+    d is accessible because the `for` loop does not mark a new scope, but if it
+    did, we would have an error and its behavior would be similar to:
+    ```python
+    def noaccess():
+        for i in range(5):
+            d = i * 2
+    noaccess()
+    print(d)
+    ```
+    Python says NameError: name 'd' is not defined
+
+
+
+### 90.3 TypeError
+
+These exceptions are caused when the type of some object should be different
+
+- TypeError: [definition/method] takes ? positional arguments but ? was given
+
+    A function or method was called with more(or less) arguments than the ones
+    it can accept.
+
+    ```python
+    >>> def foo(a):
+    ...     return a
+    ... 
+    >>> foo(a, b, c, d)
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    NameError: name 'a' is not defined
+    >>> foo(1, 2, 3, 4)
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: foo() takes 1 positional argument but 4 were given
+
+    >>> def bar(a, b, c, d): return a+b-c+d
+    ...
+    >>> bar(1)
+    traceback (most recent call last):
+      file "<stdin>", line 1, in <module>
+    typeerror: bar() missing 3 required positional arguments: 'b', 'c', and 'd'
+    ```
+
+    Note: if you want use an unknown number of arguments, you can use 
+    `*args or **kwargs`.
+
+- TypeError: unsupported operand type(s) for [operand]: '???' and '???'
+    
+    Some types cannot be operated together, depending on the operand.
+
+    For example: + is used to concatenate and add, but you can't use any of 
+    them for both types. For instance, trying to make a `set` by concatenating
+    `set1 and tuple1` gives the error.
+    ```python
+    >>> set1, tuple1 = {1, 2}, (3, 4)
+    >>> a = set1 + tuple1
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: unsupported operand type(s) for +: 'set' and 'tuple'
+    ```
+
+    Some types(eg: int and string) use both + but for different things:
+
+    Or they may not be even used for anything
+    ```python
+    >>> b = 400 + 'foo'
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: unsupported operand type(s) for +: 'int' and 'str'
+    >>> c = ["a", "b"] - [1, 2]
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: unsupported operand type(s) for -: 'list' and 'list'
+    ```
+
+    But you can for example add a `float` to an `int`:
+    ` d = 1 + 1.0`
+
+- TypeError: '???' object is not iterable/subscriptable
+    
+    For an object ot be iterable it can take sequential indexes starting from
+    zero until the indexes are no longer valid and a IndexError is raised(More
+    technically: it has to have an `__iter__` method which returns an 
+    `__iterator__` or which defines a `__getitem__` method that does what was
+    previously mentioned).
+
+    Here we are saying that bar is the zeroth item of 1. Nonsense:
+    ```python
+    >>> foo = 1
+    >>> bar = foo[0]
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: 'int' object is not subscriptable
+    >>> amount = 10
+    >>> for x in amount: print(x)
+    ...
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: 'int' object is not iterable
+    ```
+
+- TypeError: '???' object is not callable
+    
+    You are defining a variable and calling it later(like what you do with a 
+    function or method)
+
+    ```python
+    >>> foo = 'notAFunction'
+    >>> foo()
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: 'str' object is not callable
+    ```
+
+
+
+### 90.4 Syntax Error on good code
+The gross majority of the time a SyntaxError which points to an uninteresting 
+line means there is an issue on the line before it(in this example, it's a
+missing parenthesis):
+```python
+>>> def my_print():
+...     x = (1 + 1
+...     print(x)
+  File "<stdin>", line 3
+    print(x)
+        ^
+SyntaxError: invalid syntax
+```
+
+The most common reason for this issue is mismatched parentheses/brackets, as
+the example shows. There is one major caveat for print statements in Python 3:
+```python
+>>> print "hello world"
+  File "<stdin>", line 1
+    print "hello world"
+                      ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print("hello world")?
+```
+
+Because the print statement was replaced with the print() function
+
+
+
+### 90.5 IndentationErrors(or indentation SyntaxErrors)
+In most other languages indentation is not compulsory, but in Python(and other
+languages: early versions of FORTRAN, Makefiles, Whitespace(esoteric language),
+etc.) that is not the case, what can be confusing is you come from another 
+language, if you were copying code from an example to your own, or simply if 
+you are new.
+
+- IndentationError/SyntaxError: unexpected indent
+    
+    This exception is raised when the indentation level increases with no 
+    reason.
+
+    ```python
+    >>> print('This line is ok')
+    This line is ok
+    >>>     print('This line isn't ok')
+      File "<stdin>", line 1
+        print('This line isn't ok')
+        ^
+    IndentationError: unexpected indent
+    ```
+    ```python
+    >>> print('hello')
+    hello
+    >>>  print('This line isn't ok')
+      File "<stdin>", line 1
+          print('This line isn't ok')
+              ^
+    IndentationError: unexpected indent
+    ```
+
+- IndentationError/SyntaxError: unindent does not match any outer indentation
+    level
+
+    ```python
+    >>> def foo():
+    ...     print('this should be part of foo()')
+    ...    print('Error')
+      File "<stdin>", line 3
+          print('Error')
+                       ^
+    IndentationError: unindent does not match any outer indentation level\
+    ```
+
+- IndentationError: expected an indented block
+    
+    After a colon(and then a new line) the indentation level has to increase.
+    This error is raised when that didn't happen.
+    ```python
+    >>> if ok:
+    ... pass
+      File "<stdin>", line 2
+        pass
+           ^
+    IndentationError: expected an indented block
+    ```
+
+- IndentationError: inconsistent use of tabs and spaces in indentation
+
+    ```python
+    >>> def foo():
+    ...     if ok:
+    ...       return "Two != Four != Tab"
+    ...         return 'I don't care i do whatever i want'
+      File "<stdin>", line 4
+          return 'I don't care i do whatever i want'
+              ^
+    IndentationError: unexpected indent
+    ```
+
+    __How to avoid this error
+    1. Set your editor to use 4 spaces for indentation
+    2. Make a search and replace to replace all tabs with 4 spaces.
+    3. Make sure your editor is set to display tabs as 8 spaces, so that you 
+        can realize easily that error and fix it.
+
+
+
+# Chapter 77: Context Managers("with Statement")
+While Python's context managers are widely used, few understand the purpose 
+behind their use. These statements, commonly used with reading and writing 
+files, assist the application in conserving system memory and improve resource
+management by ensuring specific resources are only in use for certain 
+processes. This topic explains and demonstrates the use of Python's context 
+managers.
+
+
+
+### 77.1 Introduction to context managers and the with statement
+
+A context manager is an object that is notified when a context(a block of code)
+starts and ends. You commonly use one with the `with` statement. It takes care 
+of notifying.
+
+For example, file objects are context managers. When a context ends, the file
+object is closed automatically:
+```python
+open_file = open(filename)
+with open_file:
+    file_contents = open_file.read()
+
+# the open_file object has automatically been closed.
+```
+
+The above example is usually simplified by using the as keyword:
+```python
+with open(filename) as open_file:
+    file_contents = open_file.read()
+
+# the open_file object has automatically been closed.
+```
+
+Anything that ends execution of the block causes the context manager's exit
+method to be called. This includes exceptions, and can be useful when an error
+causes you to prematurely exit from an open file or connection. Exiting a 
+script without properly closing files/connections is a bad idea, that may cause
+data loss or other problems. By using a context manager you can ensure that
+precautions are always taken to prevent damage or loss in this way. This 
+feature was added in Python 2.5.
+
+
+
+### 77.2 Writing your own context manager
+A context manager is any object that implements two magic methods `__enter__() 
+and __exit__()` (although it can implement other methods as well)
+
+```python
+class AContextManager():
+    def __enter__(self):
+        print('Entered')
+        # optionally return an object
+        return "A-instance"
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        print("Exited" + (" (with an exception)" if exception_type else ""))
+        # return True if you want to suppress the exception
+```
+
+If the context exits with an exception, the information about that exception 
+will be passed as a triple `exception_type, exception_value, traceback`(these
+are the same variables as returned by the `sys.exc_info()` function). If the
+context exits normally, all three of these arguments will be None.
+
+If an exception occurs and is passed to the `__exit__`method, the method can
+return `True` in order to suppress the exception, or the exception will be 
+raised at the end of the `__exit__` function.
+
+```python
+with AContextManager() as a:
+    print('a is %r' % a)
+# Entered
+# a is 'A-instance'
+# Exited
+
+with AContextManager() as a:
+    print('a is %d' % a)
+# Entered
+# Exited with an exception
+# Traceback (most recent call last):
+#   File "<stdin>, line 2, in <module>
+# TypeError: %d format: a number is required, not str
+```
+
+Note that in the second example even though an exception occurs in the middle
+of the body of the with-statement, the `__exit__` handler still gets executed,
+before the exception propagates to the outer scope.
+
+If you only need an `__exit__` method, you can return the instance of the 
+context manager:
+
+```python
+class MyContextManager:
+    def __enter__(self):
+        return self
+
+    def __exit__(self):
+        print('something')
+```
+
+
+
+### 77.3 Writing your own contextmanager using generator syntax
+It is also possible to write a context manager using generator syntax thanks to
+the `contextlib.contextmanager` decorator:
+
+```python
+import contextlib
+
+
+@contextlib.contextmanager
+... def context_manager(num):
+...     print('Enter')
+...     yield num+1
+...     print('Exit')
+...
+>>> with context_manager(2) as cm:
+...     # the following instructions are run when the 'yield' point of the 
+...     # context manager is reached.
+...     # 'cm' will have the value that was yielded
+...     print('Right in the middle with cm = {}'.format(cm))
+...
+Enter
+Right in the middle with cm = 3
+Exit
+```
+
+The decorator simplifies the task of writing a context manager by converting a
+generator into one. Everything before the yield expression becomes the 
+`__enter__` method, the value yielded becomes the value returned by the 
+generator(which can be bound to a variable in the with statement), and 
+everything after the yield expression becomes the `__exit__` method.
+
+If an exception needs to be handled by the context manager, a `try...except...
+finally`-block can be written in the generator and any exception raised in the
+`with`-block will be handled by this exception block.
+
+```python
+>>> @contextlib.contextmanager
+... def error_handling_context_manager(num):
+...     print('Enter')
+...     try:
+...         yield num+1
+...     except ZeroDivisionError:
+...         print("Caught error")
+...     finally:
+...         print('Cleaning up')
+...     print('Exit')
+...
+>>> with error_handling_context_manager(-1) as cm:
+...     print('Dividing by cm = {}'.format(cm))
+...     print(2/cm)
+...
+Enter
+Dividing by cm = 0
+Caught error
+Cleaning up
+Exit
+```
+
