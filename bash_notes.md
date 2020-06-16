@@ -20,20 +20,22 @@
            current shell (equivalent to the command exit). (Only if there is no 
            text on the current line) If there is text on the current line, deletes
            the current character (then equivalent to the key Delete).
-- Ctrl+g : Abort the research and restore the original line.
 - Ctrl+h : Deletes the previous character (same as backspace).
 - Ctrl+i : Equivalent to the tab key.
 - Ctrl+j : Equivalent to the enter key.
 - Ctrl+n : (next) recalls the next command (equivalent to the key ↓).
-- Ctrl+o : Executes the found command from history, and fetch the next line 
-           relative to the current line from the history for editing.
 - Ctrl+p : (previous) recalls the prior command (equivalent to the key ↑).
+
 - Ctrl+r : (reverse search) recalls the last command including the specified 
            character(s). A second Ctrl+r recalls the next anterior command that 
            corresponds to the search
+- Ctrl+g : Abort the research and restore the original line.
+- Ctrl+o : Executes the found command from history, and fetch the next line 
+           relative to the current line from the history for editing.
 - Ctrl+s : Go back to the next more recent command of the research (beware to not 
            execute it from a terminal because this command also launches its XOFF). 
            If you changed that XOFF setting, use Ctrl+q to return.
+
 - Ctrl+v : If the next input is also a control sequence, type it literally 
            (e. g. * Ctrl+v Ctrl+h types "^H", a literal backspace.)
 - Ctrl+x Ctrl+e : Edits the current line in the $EDITOR program, or vi if undefined.
