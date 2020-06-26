@@ -3960,3 +3960,1028 @@ Cleaning up
 Exit
 ```
 
+
+
+### 77.4 Multiple context managers
+You can open several content managers at the same time:
+```python
+with open(input_path) as input_file, open(output_path, 'w') as output_file:
+    # do something with both files.
+    # e.g. copy the contents of input_file into output_file
+    for line in input_file:
+        output_file.write(line + '\n')
+```
+
+It has the same effect as nesting context managers:
+```python
+with open(input_path) as input_file:
+    with open(output_path, 'w') as output_file:
+        for line in input_file:
+            output_file.write(line + '\n')
+```
+
+
+
+### 77.5 Assigning to a target
+Many context, using a database connection in a `with` statement could give you
+a cursor object:
+```python
+with database_connection as cursor:
+    cursor.execute(sql_query)
+```
+
+File objects return themselves, this makes it possible to both open the file 
+object and use it as a context manager in one expression:
+```python
+with open(filename) as open_file:
+    file_contents = open_file.read()
+```
+
+
+
+### 77.6 Manage Resources
+```python
+class File():
+    def __init__(self, filename, mode):
+        self.filename = filename
+        self.mode = mode
+
+    def __enter__(self):
+        self.open_file = open(self.filename, self.mode)
+        return self.open_file
+
+    def __exit__(self, *args):
+        self.open_file.close()
+```
+
+`__init__()` method sets up the object, in this case setting up the file name 
+and mode to open file. `__enter__()` opens and returns the file and 
+`__exit__()` just close it.
+
+using these magic methods(`__enter__, __exit__`) allows you to implement 
+objects which can be used easily with the with statement.
+
+Use File class:
+```python
+for _ in range(10000):
+    with File('foo.txt', 'w') as f:
+        f.write('foo')
+```
+
+
+
+# Chapter 98: Overloading
+
+Below are the operators that can be overloaded in classes, along with the 
+moethod definitions that are required, and an example of the operator in use 
+within an expression
+
+__N.B. The use of other as a variable name is not mandatory, but is considered 
+the norm.__
+
+```python
+Operator                Method Expression
++ Addition              __add__(self, other) a1 + a2
+- Subtraction           __sub__(self, other) a1 - a2
+* Multiplication        __mul__(self, other) a1 * a2
+@ Matrix Multiplication __matmul__(self, other) a1 @ a2 (Python 3.5)
+/ Division              __div__(self, other) a1 / a2 (Python 2 only)
+/ Division              __truediv__(self, other) a1 / a2 (Python 3)
+// Floor Division       __floordiv__(self, other) a1 // a2
+% Modulo/Remainder      __mod__(self, other) a1 % a2
+** Power                __pow__(self, other[, modulo]) a1 ** a2
+<< Bitwise Left Shift   __lshift__(self, other) a1 << a2
+>> Bitwise Right Shift  __rshift__(self, other) a1 >> a2
+& Bitwise AND           __and__(self, other) a1 & a2
+^ Bitwise XOR           __xor__(self, other) a1 ^ a2
+| (Bitwise OR)          __or__(self, other) a1 | a2
+- Negation (Arithmetic) __neg__(self) -a1
++ Positive              __pos__(self) +a1
+~ Bitwise NOT           __invert__(self) ~a1
+< Less than             __lt__(self, other) a1 < a2
+<= Less than or Equal to__le__(self, other) a1 <= a2
+== Equal to             __eq__(self, other) a1 == a2
+!= Not Equal to         __ne__(self, other) a1 != a2
+> Greater than          __gt__(self, other) a1 > a2
+>= GreaterthanorEqualto __ge__(self, other) a1 >= a2
+[index] Index operator  __getitem__(self, index) a1[index]
+in In operator          __contains__(self, other) a2 in a1
+(*args, ...) Calling    __call__(self, *args, **kwargs) a1(*args, **kwargs)
+```
+The optional parameter modulo for `__pow__` is only used by the pow built-in 
+function. 
+
+Each of the methods corresponding to a binary operator has a corresponding 
+"right" method which start with `__r`, for example `__radd__`:
+```python
+class A(object):
+    def __init__(self, a):
+        self.a = a
+    def __add__(self, other):
+        return self.a + other
+    def __radd__(self, other):
+        print('radd')
+        return other + self.a
+
+
+A(1) + 2  # Out: 3
+2 + A(1)  # prints radd. Out: 3
+```
+
+as well as a corresponding inplace version, starting with `__i`:
+```python
+>>> class B:
+...     def __init__(self, b):
+...         self.b = b
+...     def __iadd__(self, other):
+...         self.b += other.b
+...         print('iadd')
+...         return self
+...
+>>> b = B(2)
+>>> b
+<__main__.B object at 0x7f71d70914e0>
+>>> b.b
+2
+>>> other = B(3)
+>>> other
+<__main__.B object at 0x7f71d7091550>
+>>> b + other
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: unsupported operand type(s) for +: 'B' and 'B'
+>>> b += other
+iadd
+>>> b.b
+5
+>>> other.b
+3
+>>> other += b
+iadd
+>>> other.b
+8
+```
+
+Since there's nothing special about these methods, many other parts of the 
+language, parts of the standard library, and even third-party modules add magic
+methods on their own, like methods to cast object to a type or checking 
+properties of the object. For example, the builtin `str()` function calls the
+object's `__str__` method, if it exists. Some of these uses are listed below.
+
+```python
+Function                Method                      Expression
+Casting to int          __int__(self)               int(a1)
+Absolute function       __abs__(self)               abs(a1)
+Casting to str          __str__(self)               str(a1)
+Casting to unicode      __unicode__(self)           unicode(a1) (Python 2 only)
+String representation   __repr__(self)              repr(a1)
+Casting to bool         __nonzero__(self)           bool(a1)
+String formatting       __format__(self, formatstr) "Hi {:abc}".format(a1)
+Hashing                 __hash__(self)              hash(a1)
+Length                  __len__(self)               len(a1)
+Reversed                __reversed__(self)          reversed(a1)
+Floor                   __floor__(self)             math.floor(a1)
+Ceiling                 __ceil__(self)              math.ceil(a1)
+```
+There are also the special methods __enter__ and __exit__ for context managers,
+and many more.
+
+
+
+### 98.2 Magic/Dunder Methods
+Magic (also called dunder as an abbreviation for double-underscore) methods in
+Python serve a similar purpose to operator overloading in other languages. They
+allow a class to define its behavior when it is used as an operand in unary or
+binary operator expressions. They also serve as implementations called by some
+built-in functions.
+
+Consider this implementation of two-dimensional vectors.
+```python
+import math
+
+class Vector(object):
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __neg__(self):
+        """unary negation(-v)"""
+        return vector(-self.x, -self.y)
+
+    def __add__(self, other):
+        return Vector(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other):
+        # because we have defined __neg__() and __add__()
+        return self + (-other)
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
+    def __abs__(self):
+        return math.hypot(self.x, self.y)
+
+    def __str__(self):
+        # `0` stands for self
+        return '<{0.x}, {0.y}>'.format(self)
+
+    def __repr__(self):
+        return 'Vector({0.x}, {0.y})'.format(self)
+
+
+v = Vector(1, 4)
+u = Vector(2, 0)
+
+u + v       # Vector(3, 4)
+print(u + v)# "<3, 4>" (implicit string conversion)
+u - v       # Vector(1, -4)
+u == v      # False
+u + v == v + u # True
+abs(u + v)  # 5.0
+```
+
+
+
+### 98.3 Container and sequence types
+It is possible to emulate container types, which support accessing values by
+key or index.
+
+Consider this naive implementation of a sparse list, which stores only its 
+non-zero elements to conserve memory.
+```python
+class SparseList(object):
+    def __init__(self, size):
+        self.size = size
+        self.data = {}
+
+    def __getitem__(self, index):
+        if index < 0:
+            index += self.size
+        if index >= self.size:
+            raise IndexError(index)
+
+        try:
+            return self.data[index]
+        except KeyError:
+            return 0.0
+
+    def __setitem__(self, index, value):
+        self.data[index] = value
+
+    def __delitem(self, index):
+        if index in self.data:
+            del self.data[index]
+
+    def __contains__(self, value)
+        """value in self"""
+        return value == 0.0 or value in self.data.values()
+
+    def __len__(self):
+        return self.size
+
+    def __iter__(self):
+        return (self[i] for i in range(self.size))
+
+
+lst = SparseList(10 ** 6)
+0 in lst        # True
+10 in lst       # False
+
+lst[12345] = 10
+10 in lst       # True
+lst[12345]      # 10
+
+for v in lst:
+    pass        #0, 0, 0, ..., 10, 0, 0, ...,0
+```
+
+
+
+### 98.4 Callable types
+```python
+class Adder(object):
+...     def __init__(self, first):
+...         self.first = first
+...
+>>> class Adder(object):
+...     def __init__(self, first):
+...         self.first = first
+...     def __call__(self, second):
+...         return self.first + second
+...
+>>> add2 = Adder(2)
+>>> add2(1)
+3
+>>> add2(4)
+6
+```
+
+
+
+### 98.5 Handling unimplemented behavior
+If your class doesn't implement a specific overloaded operator for the argument
+types provided, it should `return NotImplemented`(Note that this is a special
+constant, not the same as `NotImplementedError`). This will allow Python to 
+fall back to trying other methods to make the operation work:
+
+```python
+>>> class NotAddable(object):
+...     def __init__(self, value):
+...         self.value = value
+...
+>>> class Addable(NotAddable):
+...     def __add__(self, other):
+...         return Addable(self.value + other.value)
+...     __radd__ = __add__
+...
+>>> x = NotAddable(1)
+>>> y = Addable(2)
+>>> x + x
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  TypeError: unsupported operand type(s) for +: 'NotAddable' and 'NotAddable'
+>>> y + y
+<__main__.Addable object at 0x7f1128953860>
+>>> z = x + y
+>>> z
+<__main__.Addable object at 0x7f1128953898>
+>>> z.value
+3
+>>> y.value
+2
+```
+
+
+
+# Chapter 99: Polymorphism
+
+# 99.1 Duck Typing
+Polymorphism without inheritance in the form of duck typing as available in
+Python due to its dynamic typing system. This means that as long as the classes
+contain the same methods the Python interpreter does not distinguish them, as
+the only checking of the calls occurs at run-time.
+```python
+>>> class Duck:
+...     def quack(self):
+...         print("Quaaaaaaack!")
+...     def feathers(self):
+...         print("The duck has white and gray feathers.")
+...
+>>> class Person:
+...     def quack(self):
+...         print('The person imitates a duck.')
+...     def feathers(self):
+...         print('The person takes a feather from the ground and shows it.')
+...     def name(self):
+...         print('Yan Xiao')
+...
+>>> def in_the_forest(obj):
+...     obj.quack()
+...     obj.feathers()
+...
+>>> donald = Duck()
+>>> yan = Person()
+>>> in_the_forest(donald)
+Quaaaaaaack!
+The duck has white and gray feathers.
+>>> in_the_forest(yan)
+The person imitates a duck.
+The person takes a feather from the ground and shows it.
+```
+
+
+
+### 99.2 Basic Polymorphism
+Polymorphism is the ability to perform an action on an object regardless of 
+type. This is generally implemented by creating a base class and having two or
+more subclasses that all implement methods with the same signature. Any other
+function or method that manipulates  these objects can call the same methods
+regardless of which type of object it is operating on, without needing to do
+a type check first. In object-oriented terminology when class X extend class
+Y, the Y is called super class or base class and X is called subclass or 
+derived class.
+
+```python
+class Shape:
+    """
+    This is a parent class that is intended to be inherited by other classes
+    """
+
+    def calculate_area(self):
+        """
+        This method is intended to be overridden in subclasses.
+        If a subclass doesn't implement it but it is called, NotImplemented will be raised.
+        """
+        raise NotImplemented
+    
+class Square(Shape):
+    """
+    This is a subclass of the Shape class, and represents a square
+    """
+    side_length = 2
+    # in this example, the sides are 2 units long
+
+    def calculate_area(self):
+        """
+        This method overrides Shape.calculate_area(). When an object of type
+        Square has its calculate_area() method called, this is the method that
+        will be called, rather than the parent class' version.
+        It performs the calculation necessary for this shape, a square, and
+        returns the result.
+        """
+        return self.side_length * 2
+
+class Triangle(Shape):
+    """
+    This is also a subclass of the Shape class, and it represents a triangle
+    """
+    base_length = 4
+    height = 3
+
+    def calculate_area(self):
+        """
+        This method also overrides Shape.calculate_area() and performs the area
+        calculation for a triangle, returning the result.
+        """
+        return 0.5 * self.base_length * self.height
+
+
+def get_area(input_obj):
+    """
+    This function accepts an input object, and will call that object's
+    calculate_area() method. Note that the object type is not specified. It
+    could be a Square, Triangle, or Shape object.
+    """
+    print(input_obj.calculate_area())
+
+
+# Create one object of each class
+shape_obj = Shape()
+square_obj = Square()
+triangle_obj = Triangle()
+# Now pass each object, one at a time, to the get_area() function and see the
+# result.
+get_area(shape_obj)   # None or error
+get_area(square_obj)  # 4
+get_area(triangle_obj)# 6.0
+```
+
+**What happens without polymorphism?**
+
+Without polymorphism, a type check may be required before performing an action
+on an object to determine the correct method to call. The following **counter
+example** performs the same task as the previous code, but without the use of
+polymorphism, the `get_area()` function has to do more work.
+```python
+class Square:
+    side_length = 2
+
+    def calculate_square_area(self):
+        return self.side_length ** 2
+
+class Triangle:
+    base_length = 4
+    height = 3
+    def calculate_triangle_area(self):
+        return (0.5 * self.base_length) * self.height
+
+
+def get_area(input_obj):
+    # Notice the type checks that are now necessary here. These type checks
+    # could get very complicated for a more complex example, resulting in
+    # duplicate and difficult to maintain code.
+    if type(input_obj).__name__ == "Square":
+        area = input_obj.calculate_square_area()
+    elif type(input_obj).__name__ == "Triangle":
+        area = input_obj.calculate_triangle_area()
+
+    print(area)
+
+
+# Create one object of each class
+square_obj = Square()
+triangle_obj = Triangle()
+# Now pass each object, one at a time, to the get_area() function and see the
+# result.
+get_area(square_obj)        # 4
+get_area(triangle_obj)      # 6.0
+```
+
+**Important Note**
+
+Note that the classes used in the counter example are 'new style' classes and
+implicitly inherit from the object class if Python 3 is being used. 
+Polymorphism will work both in Python 2.x and 3.x, but the polymorphism counter
+example code will raise an exception if run in a Python 2.x interpreter because
+`type(input_obj).name` will return 'instance' instead of the class name if they 
+do not explicitly inherit from object, resulting in area never being assigned 
+to.
+
+
+
+# Chapter 100: Method Overriding
+
+### 100.1 Basic method overriding
+Here is an example of basic overriding in Python(for the sake of clarity and
+compatibility with both Python 2 and 3, using new style class and print with())
+```python
+>>> class Parent(object):
+...     def introduce(self):
+...         print('Hello!')
+...     def print_name(self):
+...         print('parent')
+...
+>>> class Child(Parent):
+...     def print_name(self):
+...         print('child')
+...
+>>> p = Parent()
+>>> c = Child()
+>>> p.introduce()
+Hello!
+>>> p.print_name()
+parent
+>>> c.introduce()
+Hello!
+>>> c.print_name()
+child
+```
+When the Child class is created, it inherits the methods of the Parent class.
+This means that any methods that the parent class has, the child will also 
+have. In the example, the introduce is defined for the Child class because it
+is defined for Parent, despite not being defined explicitly in the class
+definition of Child.
+
+In this example, the overriding occurs when Child defines its own `print_name`
+method. If this method was not declared, then `c.print_name()` would have 
+printed "Parent". However, Child has overridden the Parent's definition of 
+`print_name`, and so now upon calling `c.print_name()`, the word "Child" is 
+printed.
+
+
+
+# Chapter 101: user-Defined Methods
+
+### 101.1 Creating user-defined method objects
+User-defined method objects may be created when getting an attribute of a class
+(perhaps via an instance of that class), if that attribute is a user-defined 
+function object, an unbound user-defined method object, or a class method 
+object.
+```python
+>>> class A(object):
+...     def func(self):
+...         pass
+...     @classmethod
+...     def classMethod(self):
+...         pass
+...
+>>> class B(object):
+...     unboundMeth = A.func
+...
+>>> a = A()
+>>> b = B()
+>>>
+>>> print(A.func)
+<function A.func at 0x7f4b58b62c80>
+>>> print(a.func)
+<bound method A.func of <__main__.A object at 0x7f4b58b6aa20>>
+>>> print(B.unboundMeth)
+<function A.func at 0x7f4b58b62c80>
+>>> print(b.unboundMeth)
+<bound method A.func of <__main__.B object at 0x7f4b58b6a978>>
+>>> print(A.classMethod)
+<bound method A.classMethod of <class '__main__.A'>>
+>>> print(a.classMethod)
+<bound method A.classMethod of <class '__main__.A'>>
+```
+
+When the attribute is a user-defined method object, a new method object is only
+created if the class from which it is being retrieved is the same, or a derived
+class of, the class stored in the original mehtod object; otherwise, the 
+original method object is used as it is.
+
+```python
+>>> class Parent:
+...     def func(self):
+...         pass
+...     func2 = func
+...
+>>> class Child(Parent):
+...     func = Parent.func
+...
+>>> class AnotherClass(object):
+...     func = Parent.func
+...
+>>> print(Parent.func is Parent.func)
+True
+>>> print(Parent.func2 is Parent.func2)
+True
+>>> print(Child.func is Child.func)
+True
+>>> print(AnotherClass.func is AnotherClass.func)
+True
+```
+what the fuck, the result is different from the book.
+
+
+
+### 101.2 Turtle example
+
+The following is an example of using an user-defined function to be called 
+multiple times in a script with ease.
+
+```python
+>>> import turtle
+>>> import time
+>>> import random
+>>>
+>>> turtle.speed(0)
+>>> turtle.colormode(255)
+>>> turtle.pensize(4)
+>>> def triangle(size):
+...     turtle.forward(size)
+...     turtle.right(90)
+...     turtle.forward(size)
+...     turtle.right(135)
+...     turtle.forward(size * 1.5)
+...
+>>> while(1):
+...     turtle.setpos(random.randint(-200, 200), random.randint(-200, 200))
+...     turtle.pencolor(random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
+...     triangle(random.randint(5, 55))
+...     turtle.pencolor(random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
+...
+```
+
+
+
+# Chapter 83: Parsing Command Line arguments
+Most command line tools rely on arguments passed to the program upon its 
+execution. Instead of prompting for input, these programs expect data or 
+specific flags(which become booleans) to be set. This allows both the user and
+other programs to run the Python file passint it data as it start. This section
+explains and demonstrate the implementation and usage of command line arguments
+in Python.
+
+
+
+### 83.1 Hello world in argparse
+The following program says hello to the user. It takes one positional argument,
+the name of the user, and can also be told the greeting.
+
+```python
+import argparse
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    'name',
+    help='name of user'
+)
+parser.add_argument(
+    '-g', '--greeting',
+    default='Hello',
+    help='optional alternate greeting'
+)
+
+args = parser.parse_args()
+print("{greeting}, {name}!".format(greeting=args.greeting, name=args.name)
+)
+```
+
+```bash
+xy@lyzh:~/projects/win_projects/PythonTutorials/tutorial$ python3 hello.py  --help
+usage: hello.py [-h] [-g GREETING] name
+
+positional arguments:
+  name                  name of user
+
+optional arguments:
+-h, --help              show this help message and exit
+-g GREETING, --greeting GREETING
+                        optional alternate greeting
+xy@lyzh:~/projects/win_projects/PythonTutorials/tutorial$ python hello.py world
+Hello, world!
+xy@lyzh:~/projects/win_projects/PythonTutorials/tutorial$ python hello.py -g Xinyu Xiao
+Xinyu, Xiao!
+```
+
+
+
+### 83.2 using command line arguments with argv
+Whenever a Python script is invoked from the command line, the user may supply 
+additional **command line arguments** which will be passed on to the script.
+These arguments will be available to the programmer from the system variable
+`sys.argv`("argv" is a traditional name used in most programming languages, and
+it means "argument vector").
+
+By convention, the first element in the `sys.argv` list is the name of the 
+Python script itself, while the rest of the elements are the tokens passed by
+the user when invoking the script.
+
+```bash
+xy@lyzh:~/projects/win_projects/PythonTutorials/tutorial$ python3 hello.py
+['hello.py']
+xy@lyzh:~/projects/win_projects/PythonTutorials/tutorial$ python3 hello.py foo
+['hello.py', 'foo']
+xy@lyzh:~/projects/win_projects/PythonTutorials/tutorial$ python3 hello.py foo bar
+['hello.py', 'foo', 'bar']
+```
+
+Here's another example of how to use `argv`. We first strip off the initial 
+element of `sys.argv` because it contains the script's name. Then we combine 
+the rest of the arguments into a single sentence, and finally print that 
+sentence prepending the name of the currently logged-in user(so that is 
+emulates a chat program).
+
+```python
+import getpass
+import sys
+words = sys.argv[1:]
+sentence = " ".join(words)
+print("[%s] %s" % (getpass.getuser(), sentence))
+```
+
+The algorithm commonly used when "manually" parsing a number of non-positional
+arguments is to iterate over the `sys.argv` list. One way is to go over the 
+list and pop each element of it:
+```python
+# reverse and copy sys.argv
+argv = reversed(sys.argv)
+# extract the first element
+arg = argv.pop()
+# stop iterating when there's no more args to pop()
+while len(argv) > 0:
+    if arg in ('-f', '--foo'):
+        print('seen foo!')
+    elif arg in ('-b', '--bar'):
+        print('seen bar!')
+    elif arg in ('-a', '--with-arg'):
+        arg = arg.pop()
+        print('seen value: {}'.format(arg))
+    # get the next value
+    arg = argv.pop()
+```
+
+
+
+### 83.3 Setting mutually exclusive arguments with argparse
+If you want two or more arguments to be mutually exclusive. You can use the 
+function `argparse.ArgumentParser.add_mutually_exclusive_group()`. In the 
+example below, either foo or bar can exist but not both at the same time.
+
+```python
+xy@lyzh:~/projects/win_projects/PythonTutorials/python_notes$ python3 mutually_exclusive_args.py -f xinyu
+foo = xinyu
+bar = None
+xy@lyzh:~/projects/win_projects/PythonTutorials/python_notes$ python3 mutually_exclusive_args.py -f xinyu -b xiao
+usage: mutually_exclusive_args.py [-h] [-f FOO | -b BAR]
+mutually_exclusive_args.py: error: argument -b/--bar: not allowed with argument -f/--foo
+```
+
+As you can see, if you try to run the script specifying both --fo and --bar 
+arguments, the script will complani with the below message.
+
+
+
+### 83.4 Basic example with docopt
+`docopt` turns command-line argument parsing on its head. Instead of parsing 
+the arguments, you just **write the usage string** for your program, and docopt
+**parses the usage string** and use it to extract the command line arguments.
+
+```python
+"""
+Usage:
+    script_name.py [-a] [-b] <path>
+
+Options:
+    -a            Print all the things
+    -b            Get more bees into the path
+"""
+from docopt import docopt
+
+
+if __name__ == '__main__':
+    args = docopt(__doc__)
+    import pprint; pprint.pprint(args)
+```
+
+```python
+(py3) xy@lyzh:~/projects/win_projects/PythonTutorials/python_notes$ python script_name.py
+Usage:
+    script_name.py [-a] [-b] <path>
+(py3) $ python script_name.py something
+{'-a': False,
+ '-b': False,
+ '<path>': 'something'}
+$ python script_name.py something -a
+{'-a': True,
+ '-b': False,
+ '<path>': 'something'}
+$ python script_name.py -b something -a
+{'-a': True,
+ '-b': True,
+ '<path>': 'something'}
+```
+
+
+
+### 83.5 Custom parser error message with argparse
+You can create parser error messages according to your script needs. This is 
+through the `argparse.ArgumentParser.error` function. The below example shows
+the script printing a usage and an error message to `stderr` when --foo is 
+given but not --bar.
+
+```python
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--foo')
+    parser.add_argument('-b', '--bar')
+    args = parser.parse_args()
+
+    if args.foo and args.bar is None:
+        parser.error('--foo requires --bar. You did not specify bar.')
+
+    print(f'foo = {args.foo}')
+    print(f'bar = {args.bar}')
+
+
+if __name__ == '__main__':
+    main()
+```
+
+```python
+$ python3 custom_parser_err_msg.py -f xinyu
+usage: custom_parser_err_msg.py [-h] [-f FOO] [-b BAR]
+custom_parser_err_msg.py: error: --foo requires --bar. You did not specify bar.
+$ python3 custom_parser_err_msg.py -f xinyu -b xiao
+foo = xinyu
+bar = xiao
+```
+
+
+
+### 83.6 Conceptual grouping of arguments with argparse.add_argument_group()
+When you create an argparse ArgumentParser() and run your program with '-h' you
+get an automated usage message explaining what arguments you can run your 
+software with. By default, positional arguments and conditional arguments are
+separated into two categories, for example, here is a small script(example.py)
+and the output when you run `python example.py -h`
+
+```python
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser(description=' Simple example')
+    parser.add_argument('name', help='Who to greet', default='World')
+    parser.add_argument('--bar_this')
+    parser.add_argument('--bar_that')
+    parser.add_argument('--foo_this')
+    parser.add_argument('--foo_that')
+
+    args = parser.parse_args()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+```python
+usage: example.py [-h] [--bar_this BAR_THIS] [--bar_that BAR_THAT]
+                  [--foo_this FOO_THIS] [--foo_that FOO_THAT]
+                  name
+
+Simple example
+
+positional arguments:
+name                 Who to greet
+
+optional arguments:
+-h, --help           show this help message and exit
+--bar_this BAR_THIS
+--bar_that BAR_THAT
+--foo_this FOO_THIS
+--foo_that FOO_THAT
+```
+
+There are some situations where you want to separate your arguments into 
+further conceptual sections to assist your user. For example, you may wish to
+have all the input options in one group, and all the output formatting options
+in another. The above example can be adjusted to separate the `--foo_* args` 
+from the `--bar_* args` like so.
+
+```python
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser(description=' Simple example')
+
+    parser.add_argument('name', help='Who to greet', default='World')
+    # Create two argument groups
+    foo_group = parser.add_argument_group(title='Foo options')
+    bar_group = parser.add_argument_group(title='Bar options')
+    # Add arguments to those groups
+    bar_group.add_argument('--bar_this')
+    bar_group.add_argument('--bar_that')
+    foo_group.add_argument('--foo_this')
+    foo_group.add_argument('--foo_that')
+
+    args = parser.parse_args()
+
+
+main()
+
+```
+
+```python
+usage: arg_group.py [-h] [--bar_this BAR_THIS] [--bar_that BAR_THAT]
+                    [--foo_this FOO_THIS] [--foo_that FOO_THAT]
+                                        name
+
+Simple example
+
+positional arguments:
+name                 Who to greet
+
+optional arguments:
+-h, --help           show this help message and exit
+
+Foo options:
+--foo_this FOO_THIS
+--foo_that FOO_THAT
+
+Bar options:
+--bar_this BAR_THIS
+--bar_that BAR_THAT
+```
+
+
+
+### 83.7 Advanced example with docopt and docopt_dispatch
+As with docopt, with `[docopt_dispatch]` you craft your `--help` in the 
+`__doc__` variable of your entry-point module. There, you call `dispatch` with
+the doc string as argument, so it can run the parser over it.
+
+That being done, instead of handling manually the arguments(which usually ends
+up in a high cyclomatic if/else structure), you leave it to dispatch giving
+only how you want to handle the set of arguments.
+
+This is what the `dispatch.on` decorator is for: you give it the argument or
+sequence of arguments that should trigger the function, and that function will
+be executed with the matching values as parameters.
+
+```python
+"""Run something in development or production mode.
+
+Usage: docopt_disp.py --development <host> <port>
+       docopt_disp.py --production <host> <port>
+       docopt_disp.py items add <item>
+       docopt_disp.py items delete <item>
+
+"""
+from docopt_dispatch import dispatch
+
+@dispatch.on('--development')
+def development(host, port, **kwargs):
+    print('in *development* mode')
+    print(f'host {host}, port {port}')
+
+@dispatch.on('--production')
+def development(host, port, **kwargs):
+    print('in *production* mode')
+    print(f'host {host}, port {port}')
+
+@dispatch.on('items', 'add')
+def items_add(item, **kwargs):
+    print('adding item...')
+    print(f'add item: {item}')
+
+@dispatch.on('items', 'delete')
+def items_delete(item, **kwargs):
+    print('deleting item...')
+    print(f'delete item: {item}')
+
+
+if __name__ == '__main__':
+    dispatch(__doc__)
+
+```
+
+```python
+(py3) xy@lyzh:~/projects/win_projects/PythonTutorials/python_notes/arg_parser$ python docopt_disp.py --development localhost 2020
+in *development* mode
+host localhost, port 2020
+(py3) xy@lyzh:~/projects/win_projects/PythonTutorials/python_notes/arg_parser$ python docopt_disp.py --production localhost 2020
+in *production* mode
+host localhost, port 2020
+(py3) xy@lyzh:~/projects/win_projects/PythonTutorials/python_notes/arg_parser$ python docopt_disp.py i
+tems add xinyu
+adding item...
+add item: xinyu
+(py3) xy@lyzh:~/projects/win_projects/PythonTutorials/python_notes/arg_parser$ python docopt_disp.py i
+tems delete xinyu
+deleting item...
+delete item: xinyu
+```
+
