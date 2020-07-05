@@ -24,8 +24,25 @@ def math():
 		return False
 endglobal
 
+context "math()"
+snippet sr "^2" iA
+^2
+endsnippet
 
+context "math()"
+snippet cb "^3" iA
+^3
+endsnippet
 
+context "math()"
+snippet fj "superscript" iA
+^{$1}$0
+endsnippet
+
+context "math()"
+snippet jf "subscript" iA
+_{$1}$0
+endsnippet
 snippet beg "begin{} / end{}" b
 \begin{${1:document}}
 $0
@@ -61,3 +78,6 @@ $1
 \]$0
 endsnippet
 
+snippet '(red|blue)' "textcolor" wr
+\textcolor{`!p snip.rv=match.group(1)`}{$1}$0
+endsnippet

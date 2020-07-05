@@ -141,15 +141,24 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+
 # torch bin directory
 . /home/xy/Programs/torch/install/bin/torch-activate
 
 # set matlab path
 export PATH=/usr/local/MATLAB/R2018a/bin:$PATH
 alias mrun="matlab -nodesktop -nosplash -r"
-
+################################################################################
 # set vim path
 export PATH=$PATH:/usr/local/vim8/bin
+# set athame bash path
+export PATH=$PATH:/home/xy/local/bin/
+# set default bash
+#bash_xy
+# vim editor in many contexts
+export EDITOR=/usr/local/vim8/bin/vim
+
+################################################################################
 
 # Map Capslock to Escape
 xmodmap -e 'clear Lock' -e 'keycode 0x42=Escape'
@@ -170,3 +179,16 @@ export PATH=$PATH:/home/xy/Applications
 
 # tmux setting
 export TERM=xterm-256color
+
+################################################################################
+# c/c++ include search dir
+export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/local/include/
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/include/
+# c/c++ library search dir
+export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/lib/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
+# python search dir
+export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python3/dist-packages
+export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python2.7/site-packages
+################################################################################
+

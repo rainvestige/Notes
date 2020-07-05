@@ -130,3 +130,9 @@ du -h -d 1 *
 df -h  # 查看硬盘使用情况
 
 ```
+
+
+# Deb package install
+```bash
+sudo apt --fix-broken install  *.deb
+```
