@@ -69,8 +69,8 @@
 
 
 # Bash Shell Script
-Anything that can be done in the command line 
-can be put in a script file for reuse
+Anything that can be done in the command line can be put in a script file for 
+reuse
 
 ## Follow these steps to create a script:
 1. Create a new file called script_name.sh
@@ -81,7 +81,7 @@ can be put in a script file for reuse
 
 3. Add the code:
     ```
-    #! bin/bash
+    #!/usr/bin/env bash
     echo "Hello World!"
     ```
 
@@ -124,6 +124,8 @@ du [OPTION]... [FILE]...
 du -sh  # 查询当前目录总大小
 
 du -h -d 1 *
+
+sudo du --max-depth=1 -h --threshold=100M
 ```
 
 ```bash
@@ -135,4 +137,25 @@ df -h  # 查看硬盘使用情况
 # Deb package install
 ```bash
 sudo apt --fix-broken install  *.deb
+# solve some dependency problem
+sudo apt-get -f -y install
 ```
+
+
+# user and group
+
+1. 查看
+    ```bash
+    gourps           # current logined in user's name and other user's in the same group
+
+    groups user_foo  # 查看用户`user_foo`所在的组以及组内成员
+
+    whoami           # current logined in user's name
+    ```
+
+2. change
+    ```bash
+    chgrp group_foo file_bar -R  # change the group that file_bar belong to to group_foo
+    chown user_foo file_bar -R   # change the user that file_bar belong to to user_foo
+    
+    ```
