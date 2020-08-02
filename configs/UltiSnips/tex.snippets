@@ -81,3 +81,23 @@ endsnippet
 snippet '(red|blue)' "textcolor" wr
 \textcolor{`!p snip.rv=match.group(1)`}{$1}$0
 endsnippet
+
+snippet texprepare "prepare the tex env" i
+\documentclass[11pt, a4paper, UTF8]{article}
+
+
+\usepackage{amsmath}
+\usepackage{indentfirst}
+\usepackage[dvipsnames]{xcolor}
+
+
+\author{Xinyu Xiao}
+\title{$1}
+\date{\today}
+
+
+\begin{document}
+\maketitle
+$0
+\end{document}
+endsnippet
