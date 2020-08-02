@@ -173,22 +173,34 @@ alias sudo='sudo env PATH=$PATH'
 #setterm -blength 0
 xset -b
 
-# set Application path 
-export PATH=$PATH:/home/xy/Applications
 
 
 # tmux setting
 export TERM=xterm-256color
 
 ################################################################################
+# set Application path 
+export PATH=$PATH:/home/xy/Applications:/usr/local/srslte/bin/
 # c/c++ include search dir
-export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/local/include/
-export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/include/
+#export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/local/include/
+#export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/include/
+#export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/local/srslte/include/
+#export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/srslte/include/
 # c/c++ library search dir
-export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/lib/
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
+#export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/lib/
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/srslte/lib/
+################################################################################
 # python search dir
 export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python3/dist-packages
 export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python2.7/site-packages
 ################################################################################
 
+
+# Install Ruby Gems to ~/usr/gems
+export GEM_HOME=$HOME/usr/gems
+export PATH=$PATH:$HOME/usr/gems/bin
+# Go path
+export GOPATH=$HOME/Application/go
+export GOROOT=/usr/local/go
+export PATH=$PATH:$GOPATH/bin:$GOROOT/bin
