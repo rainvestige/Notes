@@ -9,6 +9,9 @@
     ```
 
 2. Prepare the dependency for ccmake
+    ```bash
+    sudo apt-get install build-essential git
+    ```
     ![ccmake dependency]
 
 2. Build and Install
@@ -67,4 +70,3 @@
 [srslte FindUHD.cmake before change]: https://img-blog.csdnimg.cn/20200730204546360.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTE3NDUyMjg=,size_16,color_FFFFFF,t_70
 [srslte FindUHD.cmake after change]: https://img-blog.csdnimg.cn/20200730204607959.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTE3NDUyMjg=,size_16,color_FFFFFF,t_70
 [srslte build after modify FindUHD.cmake]: https://img-blog.csdnimg.cn/2020073020494418.png
-
