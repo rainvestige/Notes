@@ -86,3 +86,71 @@ Port 443
     # or
     git am [patch/to/xxx.patch]
     ```
+
+
+## Problems
+
+### A. gnutils_handshake failed: The TLS connection was non-properly terminated
+> - Reference
+> - [gnutls_handshake failed]
+
+#### 1) Problem Description
+我是在运行一个安装脚本时遇到这个问题的, 脚本使用`git clone`克隆远端gitlab下
+的一个库, 结果显示连接不上.
+![git TLS connection terminated problem 1]\
+下面这副图是用浏览器直接打开gitlab官网的结果.
+![git TLS connection terminated problem 2]
+
+#### 2) Solutions
+
+1. 安装一些必要的环境和依赖
+    ```bash
+    sudo apt-get install build-essential fakeroot dpkg-dev
+    ```
+
+2. 获取git源文件
+    ```bash
+    mkdir ~/git-rectify
+    cd ~/git-rectify
+    apt-get source git
+    ```
+
+3. 安装git依赖
+    ```bash
+    sudo apt-get build-dep git
+    sudo apt-get install libcurl4-openssl-dev
+    ```
+
+4. 修改文件
+    ```bash
+    cd git-2.17.1/
+    vim ./debian/control    # 把libcurl4-gnutls-dev修改为libcurl4-openssl-dev
+    vim ./debian/rules      # 把TEST=test整行删除
+    ```
+
+5. 编译和构建安装包
+    ```bash
+    sudo dpkg-buildpackage -rfakeroot -b
+    ```
+    这里我遇到了一个error, 不过不用管, 可以接着运行下一句.
+
+6. 安装编译好的安装包
+    ```bash
+    cd ..
+    sudo dpkg -i git_2.17.1-1ubuntu0.7_amd64.deb  # Note: `0.7`这里可能会不同
+    ```
+
+
+    
+
+
+
+
+
+
+
+
+
+[gnutls_handshake failed]: https://zhuanlan.zhihu.com/p/53961303
+[git TLS connection terminated problem 1]: https://raw.githubusercontent.com/rainvestige/PicGo/master/20200804180047.png
+[git TLS connection terminated problem 2]: https://raw.githubusercontent.com/rainvestige/PicGo/master/20200804180129.png

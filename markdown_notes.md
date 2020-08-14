@@ -32,7 +32,7 @@ Setext-style
 # PHRASE EMPHASIS
 |                     | Discription | SYNTAX                                                            |
 |---------------------|-------------|-------------------------------------------------------------------|
-| *are emphasized*.   | *斜体*      | surround the empasized word with asterisk(*) or underscore(_)     |
+| *are emphasized*.   | *斜体*      | surround the empasized word with asterisk(`*`) or underscore(_)     |
 | **are emphasized**. | **粗体**    | surround the empasized word with asterisks(**) or underscores(__) |
 
 #

@@ -1,3 +1,5 @@
+[toc]
+
 # Bash command line shortcuts
 ## Ctrl+
 - Tab ↹ : Autocompletes from the cursor position.
@@ -64,8 +66,6 @@
 
 - Alt+. : Insert the last argument to the previous command (the last word of the 
           previous history entry).
-
-
 
 
 # Bash Shell Script
@@ -159,3 +159,69 @@ sudo apt-get -f -y install
     chown user_foo file_bar -R   # change the user that file_bar belong to to user_foo
     
     ```
+
+# Third party command
+
+## how2 stackoverflow from the terminal
+> _Date: 2020.08.13 Thursday_
+
+> Ref:
+> - [npmjs package how2 readme]
+
+### A. Install
+1. You can install it via npm
+   ```bash
+   sudo npm install -g how-2   
+   ```
+2. If you don't have npm
+   ```bash
+   sudo apt-get install nodejs npm
+   
+   # Then install how2
+   sudo npm install -g how-2
+   ```
+### B. Usage
+> Ref:
+> - [how2 github readme]
+
+1. Basic
+   ```bash
+   how2 [the question]
+   ```
+
+2. Copy-Paste with mouse
+   When you are in "interactive mode" (after you press SPACE), if you want to
+   copy-paste more than one line you can use block-select:
+
+   __With Ubuntu try holding `ctrl+alt` before you select, or `alt+cmd` if 
+   you're in iTerm on Mac__
+
+3. Use it with proxy
+   Yes, you need to use `HTTP_PROXY` or `HTTPS_PROXY` environment variables. For
+   example, you could alias the proxy setting in your `~/.bashrc`:
+   ```bash
+   alias how2="HTTPS_PROXY='127.0.0.1:8888' how2"
+   ```
+
+
+## tldr: collaborative cheatsheets for console commands
+> _Date: 2020.08.13 Thursday_
+
+> Ref:
+> - [tldr github readme]
+
+### A. Install
+1. You can install it via npm
+   ```bash
+   sudo npm install -g tldr
+   ```
+### B. Usage
+1. Basic
+   ```bash
+   tldr [command]
+   tldr tar
+   ```
+
+[npmjs package how2 readme]: https://www.npmjs.com/package/how2?activeTab=readme
+[how2 github readme]: https://github.com/santinic/how2
+[tldr github readme]: https://github.com/tldr-pages/tldr
