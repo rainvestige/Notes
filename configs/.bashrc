@@ -167,7 +167,7 @@ xmodmap -e 'clear Lock' -e 'keycode 0x42=Escape'
 export PATH=$PATH:/usr/local/texlive/2019/bin/x86_64-linux
 
 # sudo 
-alias sudo='sudo env PATH=$PATH'
+alias psudo='sudo env PATH=$PATH'
 
 # shut up the bell
 #setterm -blength 0
@@ -204,3 +204,8 @@ export PATH=$PATH:$HOME/usr/gems/bin
 export GOPATH=$HOME/Application/go
 export GOROOT=/usr/local/go
 export PATH=$PATH:$GOPATH/bin:$GOROOT/bin
+
+
+# how2 alias
+alias how2="HTTPS_PROXY='127.0.0.1:8888' HTTP_PROXY='127.0.0.1:8888' how2"
+

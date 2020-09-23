@@ -17,7 +17,6 @@ noremap <LEADER><CR> :nohlsearch<CR>
 
 set nocompatible
 filetype on
-filetype indent on
 filetype plugin on
 filetype plugin indent on
 set encoding=utf-8
@@ -65,11 +64,17 @@ noremap <C-h> ^
 noremap <C-l> $
 "------------------------------------------------------------"
 "auto indent and set indent length = 4
-set softtabstop=4
-set shiftwidth=4
-set tabstop=4
-set expandtab
+set textwidth=80
+filetype indent on
 set autoindent
+set expandtab  "replace tab with spaces
+set shiftwidth=4  ">> in normal
+set tabstop=4  "tab in insert
+set softtabstop=4  "backspace can delete the expandtab spaces
+autocmd Filetype cpp setlocal cindent expandtab cino=g0 shiftwidth=2 tabstop=2 sts=2
+autocmd Filetype sh setlocal expandtab shiftwidth=2 tabstop=2 sts=2
+autocmd Filetype tex setlocal expandtab shiftwidth=2 tabstop=2 sts=2
+autocmd Filetype matlab setlocal fo+=cj expandtab
 "------------------------------------------------------------"
 " Convert word to Uppercase
 inoremap <C-u> <esc>gUiwea
@@ -145,7 +150,7 @@ nnoremap gt :YcmCompleter GetType<CR>
 nnoremap gr :YcmCompleter GoToReferences<CR>
 let g:ycm_autoclose_preview_window_after_completion=0
 let g:ycm_autoclose_preview_window_after_insertion=0
-let g:ycm_use_clangd = 0
+let g:ycm_use_clangd = 1
 let g:ycm_python_interpreter_path = "/home/xy/anaconda3/envs/py3/bin/python3"
 let g:ycm_python_binary_path = "/home/xy/anaconda3/envs/py3/bin/"
 
@@ -188,7 +193,7 @@ let g:mkdp_preview_options = {
     \ 'uml': {},
     \ 'maid': {},
     \ 'disable_sync_scroll': 0,
-    \ 'sync_scroll_type': 'middle',
+    \ 'sync_scroll_type': 'relative',
     \ 'hide_yaml_meta': 1
     \ }
 let g:mkdp_markdown_css = ''

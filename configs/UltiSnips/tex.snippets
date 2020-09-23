@@ -26,12 +26,12 @@ endglobal
 
 context "math()"
 snippet sr "^2" iA
-^2
+^2$0
 endsnippet
 
 context "math()"
 snippet cb "^3" iA
-^3
+^3$0
 endsnippet
 
 context "math()"
@@ -69,7 +69,7 @@ if t[2] and t[2][0] not in [',', '.', '?', '-', ' ']:
 	snip.rv = ' '
 else:
 	snip.rv = ''
-`$2
+`$0
 endsnippet
 
 snippet dm "Display Math" wA
@@ -78,18 +78,25 @@ $1
 \]$0
 endsnippet
 
-snippet '(red|blue)' "textcolor" wr
+snippet '(red|cyan|green)' "textcolor" wr
 \textcolor{`!p snip.rv=match.group(1)`}{$1}$0
 endsnippet
 
 snippet texprepare "prepare the tex env" i
-\documentclass[11pt, a4paper, UTF8]{article}
+\documentclass[12pt, a4paper, UTF8]{article}
 
 
+\usepackage[a4paper, total={170mm, 257mm}, left=20mm, right=20mm]{geometry}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{indentfirst}
 \usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
 
+\hypersetup{
+  colorlinks=true,
+}
+\urlstyle{same}
 
 \author{Xinyu Xiao}
 \title{$1}
@@ -100,4 +107,12 @@ snippet texprepare "prepare the tex env" i
 \maketitle
 $0
 \end{document}
+endsnippet
+
+snippet bf "bold format" w
+\textbf{$1}$0
+endsnippet
+
+snippet it "italic format" w
+\textit{$1}$0
 endsnippet

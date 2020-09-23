@@ -1,13 +1,9 @@
-[https]
-    proxy = http://127.0.0.1:8888
 [http]
     proxy = http://127.0.0.1:8888
+	sslverify = false
+	postBuffer = 123289600
 [user]
 	email = xinyuloveslife@163.com
 	name = xinyu
 [core]
     editor = vim
-[http]
-	sslverify = false
-[https]
-	postBuffer = 123289600
