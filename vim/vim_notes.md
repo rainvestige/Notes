@@ -1,8 +1,8 @@
 [toc]
 # I. Vim Install From Source Code
 > Ref: 
-- [Linux 下源码编译安装vim]
-- [源码编译安装vim]
+> - [Linux 下源码编译安装vim]
+> - [源码编译安装vim]
 
 
 > If we want to enable almost all features of vim, we must build and install 

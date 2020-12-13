@@ -15,7 +15,7 @@ Follow the instructions to continue the installation.
 
     ```bash
     conda env export > environment.yml
-    conda env create -f environment.yml 
+    conda env create -f environment.yml
     ```
     When create the new environment, the env name in environment.yml must not exist
     in your conda env.
@@ -26,16 +26,16 @@ Follow the instructions to continue the installation.
     ```bash
     conda activate py3
     ```
-    
+
     Export the pip libraries to requirements.txt
     ```bash
     pip freeze > requirements.txt
     ```
-    
+
     Enter the conda env(destination) and install the pip libraries
     ```bash
     conda activate py3
-    
+
     pip install -r requirements.txt
     ```
 
