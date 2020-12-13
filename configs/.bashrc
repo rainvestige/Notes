@@ -166,8 +166,6 @@ xmodmap -e 'clear Lock' -e 'keycode 0x42=Escape'
 # set texlive bin path
 export PATH=$PATH:/usr/local/texlive/2019/bin/x86_64-linux
 
-# sudo 
-alias psudo='sudo env PATH=$PATH'
 
 # shut up the bell
 #setterm -blength 0
@@ -179,7 +177,7 @@ xset -b
 export TERM=xterm-256color
 
 ################################################################################
-# set Application path 
+# set Application path
 export PATH=$PATH:/home/xy/Applications:/usr/local/srslte/bin/
 # c/c++ include search dir
 #export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/local/include/
@@ -205,7 +203,12 @@ export GOPATH=$HOME/Application/go
 export GOROOT=/usr/local/go
 export PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 
-
+################################################################################
+# Alias
 # how2 alias
-alias how2="HTTPS_PROXY='127.0.0.1:8888' HTTP_PROXY='127.0.0.1:8888' how2"
-
+#alias how2="HTTPS_PROXY='127.0.0.1:8888' HTTP_PROXY='127.0.0.1:8888' how2"
+# sudo alias
+alias psudo='sudo env PATH=$PATH'
+# todo.sh alias
+alias todo="todo.sh"
+################################################################################

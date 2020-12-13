@@ -1,7 +1,7 @@
 [http]
     proxy = http://127.0.0.1:8888
 	sslverify = false
-	postBuffer = 123289600
+	postBuffer = 1048576000
 [user]
 	email = xinyuloveslife@163.com
 	name = xinyu

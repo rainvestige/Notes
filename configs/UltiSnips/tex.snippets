@@ -64,12 +64,12 @@ snippet '((\d+)|(\d*)(\\)?([A-Za-z]+)((\^|_)(\{\d+\}|\d))*)/' "fraction" rw
 endsnippet
 
 snippet mk "Inline Math" wA
-$${1}$`!p
+$${1}$$0`!p
 if t[2] and t[2][0] not in [',', '.', '?', '-', ' ']:
 	snip.rv = ' '
 else:
 	snip.rv = ''
-`$0
+`
 endsnippet
 
 snippet dm "Display Math" wA
@@ -78,8 +78,12 @@ $1
 \]$0
 endsnippet
 
+
 snippet '(red|cyan|green)' "textcolor" wr
 \textcolor{`!p snip.rv=match.group(1)`}{$1}$0
+endsnippet
+snippet '(yellow)' "colorbox" wr
+\hl{$1}$0
 endsnippet
 
 snippet texprepare "prepare the tex env" i
@@ -87,16 +91,20 @@ snippet texprepare "prepare the tex env" i
 
 
 \usepackage[a4paper, total={170mm, 257mm}, left=20mm, right=20mm]{geometry}
+\usepackage{xeCJK}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{indentfirst}
 \usepackage[dvipsnames]{xcolor}
+\usepackage{soul}
 \usepackage{hyperref}
 
 \hypersetup{
   colorlinks=true,
 }
 \urlstyle{same}
+
+\sethlcolor{yellow}
 
 \author{Xinyu Xiao}
 \title{$1}

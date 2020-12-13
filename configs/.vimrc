@@ -6,7 +6,6 @@ set belloff=all
 syntax on
 set number
 set relativenumber
-set wildmenu
 set showcmd
 set wrap
 set backspace=indent,eol,start
@@ -21,7 +20,44 @@ filetype plugin on
 filetype plugin indent on
 set encoding=utf-8
 let &t_ut=''
+"##########################################################"
+" FINDING FILES:
 
+" Search down into subfolders
+" Provides tab-completion for all file-related tasks
+set path+=**
+" Dispaly all matching files when we tab complete
+set wildmenu
+
+" THINGS TO CONSIDER:
+" - `:b` lets you autocomplete any open buffer
+"##########################################################"
+" TAG JUMPING:
+
+" Create the `tags` file (may need to install ctags first)
+command! MakeTags !ctags -R .
+
+" NOW WE CAN:
+" - Use ^] to jump to tag undre cursor
+" - Use g^] for ambiguous tags
+" - User ^t to jump back up the tag stack
+
+" THINGS TO CONSIDER:
+" - This doesn't help if you want a visual list of tags
+"##########################################################"
+" AUTOCOMPLETE:
+
+" The good stuff is documented in |ins-completion|
+
+" HIGHLIGHTS:
+" - ^x^n for JUST this file
+" - ^x^f for filenames (works with our path trick!)
+" - ^x^] for tags only
+" - ^n for anything specified by the 'complete' option
+
+" NOW WE CAN:
+" - Use ^n and ^p to go back and forth in the suggestion list
+"##########################################################"
 set foldmethod=indent
 set foldlevel=99
 let &t_SI.= "\e[5 q" "SI = INSERT model
@@ -36,7 +72,7 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 
 map s <nop>
 map S :w<CR>
-"------------------------------------------------------------"
+"##########################################################"
 " screen split
 map sl :set splitright<CR>:vsplit<CR>
 map sh :set nosplitright<CR>:vsplit<CR>
@@ -47,16 +83,17 @@ map <LEADER>l <C-w>l
 map <LEADER>k <C-w>k
 map <LEADER>h <C-w>h
 map <LEADER>j <C-w>j
-" resize screen  
+" resize screen
 map <up> :res +5<CR>
 map <down> :res -5<CR>
 map <left> :vertical resize-5<CR>
 map <right> :vertical resize+5<CR>
+"##########################################################"
 " tag edit  add new tag windows
-map te :tabe<CR> 
-map th :-tabnext<CR>
-map tl :+tabnext<CR>
-"------------------------------------------------------------"
+nnoremap te :tabe<CR>
+nnoremap th <C-PageUp><CR>
+nnoremap tl <C-PageDown><CR>
+"##########################################################"
 
 " N key: go to the start of the line
 noremap <C-h> ^
@@ -88,6 +125,7 @@ Plug 'vim-airline/vim-airline'
 
 " Color scheme
 Plug 'altercation/vim-colors-solarized'
+Plug 'cocopon/iceberg.vim'
 
 " Auto complete
 Plug 'ycm-core/YouCompleteMe'
@@ -130,7 +168,7 @@ call plug#end()
 "==
 "------------------------------------------------------------"
 
-"==  
+"==
 "== colorscheme setting
 "==
 syntax enable
@@ -140,16 +178,17 @@ let g:solarized_termcolors=16
 let g:solarized_termtrans=1
 let g:solarized_visibility="normal"
 colorscheme solarized
+"colorscheme iceberg
 
-"==  
+"==
 "== you complete me setting
 "==
 nnoremap gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
 nnoremap g/ :YcmCompleter GetDoc<CR>
 nnoremap gt :YcmCompleter GetType<CR>
 nnoremap gr :YcmCompleter GoToReferences<CR>
-let g:ycm_autoclose_preview_window_after_completion=0
-let g:ycm_autoclose_preview_window_after_insertion=0
+let g:ycm_autoclose_preview_window_after_completion=1
+let g:ycm_autoclose_preview_window_after_insertion=1
 let g:ycm_use_clangd = 1
 let g:ycm_python_interpreter_path = "/home/xy/anaconda3/envs/py3/bin/python3"
 let g:ycm_python_binary_path = "/home/xy/anaconda3/envs/py3/bin/"
@@ -168,12 +207,30 @@ let g:ycm_key_list_previous_completion = ['<C-p>']
 let g:SuperTabDefaultCompletionType = '<C-n>'
 
 
-"==  
+"==
 "== ale error check setting
 "==
-let b:ale_linters = ['pylint']
-let b:ale_fixers = ['autopep8', 'yapf']
-let g:ale_echo_msg_error_str = 'error'
+" check the error
+let g:ale_linters = {
+\   'python': ['pylint', 'flake8'],
+\   'tex': [],
+\}
+" fix the error
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'python': ['autopep8', 'yapf', 'isort', 'remove_trailing_lines', 'trim_whitespace'],
+\}
+" change the format for echo messages
+let g:ale_echo_msg_error_str = 'E'
+let g:ale_echo_msg_warning_str = 'W'
+let g:ale_echo_msg_format = '[%severity%] [%linter%] %s'
+" Set this variable to 1 to fix files when you save them.
+let g:ale_fix_on_save = 1
+" show the list window
+let g:ale_open_list = 1
+let g:ale_list_vertical = 0
+let g:ale_set_quickfix = 1
+let g:ale_set_loclist = 0
 
 " ==
 " == MarkdownPreview setting
@@ -213,7 +270,7 @@ nmap <LEADER>md <Plug>MarkdownPreviewToggle
 " ==
 " == vim-table-mode create neat table
 " ==
- 
+
 " For Markdown-compatible tables use
 let g:table_mode_corner='|'
 map <LEADER>tm :TableModeToggle<CR>
@@ -223,16 +280,16 @@ map <LEADER>tdc g:table_mode_delete_column_map<CR>
 " == NERDTree
 " ==
 map tt :NERDTreeToggle<CR>
-let NERDTreeMapOpenExpl = ""
-let NERDTreeMapUpdir = ""
-let NERDTreeMapUpdirKeepOpen = "l"
-let NERDTreeMapOpenSplit = ""
-let NERDTreeOpenVSplit = ""
-let NERDTreeMapActivateNode = "i"
-let NERDTreeMapOpenInTab = "o"
-let NERDTreeMapPreview = ""
-let NERDTreeMapCloseDir = "n"
-let NERDTreeMapChangeRoot = "y"
+"let NERDTreeMapOpenExpl = ""
+"let NERDTreeMapUpdir = ""
+"let NERDTreeMapUpdirKeepOpen = "l"
+"let NERDTreeMapOpenSplit = ""
+"let NERDTreeOpenVSplit = ""
+"let NERDTreeMapActivateNode = "i"
+"let NERDTreeMapOpenInTab = "o"
+"let NERDTreeMapPreview = ""
+"let NERDTreeMapCloseDir = "n"
+"let NERDTreeMapChangeRoot = "y"
 
 " ==
 " == NERDTree-git
@@ -252,15 +309,15 @@ let g:NERDTreeIndicatorMapCustom = {
 " ==
 " == LaTex: vimtex plugin setting
 " ==
-let g:tex_flavor='latex'  
-let g:vimtex_view_method='zathura'  
-let g:vimtex_quickfix_mode=1  
-set conceallevel=1  
+let g:tex_flavor='latex'
+let g:vimtex_view_method='zathura'
+let g:vimtex_quickfix_mode=1
+set conceallevel=1
 let g:tex_conceal='abdmg'
 let g:vimtex_compiler_latexmk = {
     \ 'options' : [
     \   '-xelatex',
-    \   
+    \
     \ ],
     \}
 let g:vimtex_quickfix_latexlog = {
