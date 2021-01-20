@@ -58,8 +58,25 @@ command! MakeTags !ctags -R .
 " NOW WE CAN:
 " - Use ^n and ^p to go back and forth in the suggestion list
 "##########################################################"
-set foldmethod=indent
+" fold setting
+set foldmethod=manual
 set foldlevel=99
+set foldtext=MyFoldText()
+
+function! MyFoldText()
+    let indent_level = indent(v:foldstart)
+    let indent = repeat(' ',indent_level)
+    let txt = foldtext()
+    return indent . txt
+endfunction
+
+augroup remember_folds
+    autocmd!
+    autocmd BufWinLeave * mkview
+    autocmd BufWinEnter * silent! loadview
+augroup END
+
+
 let &t_SI.= "\e[5 q" "SI = INSERT model
 let &t_SR.= "\e[4 q" "SR = REPLACE model
 let &t_EI.= "\e[1 q" "EI = NORMAL model(else)
@@ -109,6 +126,7 @@ set shiftwidth=4  ">> in normal
 set tabstop=4  "tab in insert
 set softtabstop=4  "backspace can delete the expandtab spaces
 autocmd Filetype cpp setlocal cindent expandtab cino=g0 shiftwidth=2 tabstop=2 sts=2
+autocmd Filetype c setlocal cindent expandtab cino=g0 shiftwidth=2 tabstop=2 sts=2
 autocmd Filetype sh setlocal expandtab shiftwidth=2 tabstop=2 sts=2
 autocmd Filetype tex setlocal expandtab shiftwidth=2 tabstop=2 sts=2
 autocmd Filetype matlab setlocal fo+=cj expandtab
@@ -214,12 +232,15 @@ let g:SuperTabDefaultCompletionType = '<C-n>'
 let g:ale_linters = {
 \   'python': ['pylint', 'flake8'],
 \   'tex': [],
+\   'c': ['ccls', 'clang', 'clangd', 'clangtidy', 'cquery', 'flawfinder', 'gcc'],
 \}
 " fix the error
 let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
 \   'python': ['autopep8', 'yapf', 'isort', 'remove_trailing_lines', 'trim_whitespace'],
 \}
+" Only run linters named in `ale_linters` settings
+let g:ale_linters_explicit = 1
 " change the format for echo messages
 let g:ale_echo_msg_error_str = 'E'
 let g:ale_echo_msg_warning_str = 'W'
@@ -231,6 +252,7 @@ let g:ale_open_list = 1
 let g:ale_list_vertical = 0
 let g:ale_set_quickfix = 1
 let g:ale_set_loclist = 0
+let g:ale_list_window_size = 5
 
 " ==
 " == MarkdownPreview setting
@@ -330,6 +352,7 @@ let g:vimtex_quickfix_latexlog = {
 
 let g:vimtex_quickfix_ignore_filters = [
       \ 'Unused global option',
+      \ 'LaTex Font Warning',
       \]
 
 " ==

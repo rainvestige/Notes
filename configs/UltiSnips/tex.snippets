@@ -43,6 +43,7 @@ context "math()"
 snippet jf "subscript" iA
 _{$1}$0
 endsnippet
+
 snippet beg "begin{} / end{}" b
 \begin{${1:document}}
 $0
@@ -91,6 +92,8 @@ snippet texprepare "prepare the tex env" i
 
 
 \usepackage[a4paper, total={170mm, 257mm}, left=20mm, right=20mm]{geometry}
+\usepackage{graphicx}
+\usepackage{caption}
 \usepackage{xeCJK}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -98,6 +101,8 @@ snippet texprepare "prepare the tex env" i
 \usepackage[dvipsnames]{xcolor}
 \usepackage{soul}
 \usepackage{hyperref}
+
+\graphicspath{{images/}}
 
 \hypersetup{
   colorlinks=true,
