@@ -213,7 +213,8 @@ let g:ycm_python_binary_path = "/home/xy/anaconda3/envs/py3/bin/"
 
 let g:ycm_python_sys_path = [
   \   '/home/xy/anaconda3/envs/py3/lib/python3.6/',
-  \   '/home/xy/anaconda3/envs/py3/lib/python3.6/site-packages/']
+  \   '/home/xy/anaconda3/envs/py3/lib/python3.6/site-packages/',
+  \   '/usr/local/lib/python2.7/dist-packages/']
 let g:ycm_extra_conf_vim_data = [
   \  'g:ycm_python_interpreter_path',
   \  'g:ycm_python_sys_path'
@@ -333,7 +334,7 @@ let g:NERDTreeIndicatorMapCustom = {
 " ==
 let g:tex_flavor='latex'
 let g:vimtex_view_method='zathura'
-let g:vimtex_quickfix_mode=1
+let g:vimtex_quickfix_mode=2
 set conceallevel=1
 let g:tex_conceal='abdmg'
 let g:vimtex_compiler_latexmk = {
@@ -352,7 +353,7 @@ let g:vimtex_quickfix_latexlog = {
 
 let g:vimtex_quickfix_ignore_filters = [
       \ 'Unused global option',
-      \ 'LaTex Font Warning',
+      \ 'Font shape',
       \]
 
 " ==

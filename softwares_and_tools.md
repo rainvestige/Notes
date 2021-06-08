@@ -1,3 +1,9 @@
+## Sources
+1. apt
+2. snap
+3. build from source code
+
+
 ## Softwares and Tools
 Record softwares and tools i used
 
@@ -6,15 +12,14 @@ Record softwares and tools i used
 | [texlive]                | latex                | 6.5G     |
 | [vim]                    | text editor          | 500M+50M |
 | [vimtex]                 | a vim latex plugin   |
-| [tmux]                   | terminal management  |
-| [zathura]                | pdf viewer           |
-| [Flameshot]              | screen capture       |
-| [PicGo]                  | Picture Uploader     |
-| [telegram]               | messaging app        |
+| [tmux]                   | terminal management  | 647K     |
+| [zathura]                | pdf viewer           | 510K     |
+| [Flameshot]              | screen capture       | 823K     |
+| [PicGo]                  | Picture Uploader     | 66M      |
+| [telegram]               | messaging app        | 91M      |
 | [proxychains-ng]         | terminal proxy       |
 | [rime]                   | input method         |
-| [Qv2ray]                 |                      |
-| [via]                    | android web browser  |
+| [Qv2ray]                 | proxy                | 36M      |
 | [nodejs]                 | JS runtime env       |
 | [how2]                   | terminal stackflow   |
 | [tldr]                   | cli manual           |
@@ -26,7 +31,10 @@ Record softwares and tools i used
 | [cheat.sh]               | cheatsheet           |
 | [flat-remix-gnome]       | gnome theme          |
 | [english-dictionary-cli] | dictionary           |
+| [todo]                   | todo list            |
 | [Anki]+[mpv]             | flash card & media   |
+| [via]                    | android web browser  |
+| [dvipng]                 | convert dvi to png   |
 
 | Name       | Describe                                               |
 |------------|--------------------------------------------------------|
@@ -60,3 +68,4 @@ Record softwares and tools i used
 [Anki]: https://apps.ankiweb.net/
 [mpv]: https://mpv.io/installation/
 [texlive]: https://mirrors.aliyun.com/CTAN/systems/texlive/
+[todo]: https://github.com/todotxt/todo.txt-cli

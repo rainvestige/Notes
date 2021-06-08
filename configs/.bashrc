@@ -161,7 +161,8 @@ export EDITOR=/usr/local/vim8/bin/vim
 ################################################################################
 
 # Map Capslock to Escape
-xmodmap -e 'clear Lock' -e 'keycode 0x42=Escape'
+#xmodmap -e 'clear Lock' -e 'keycode 0x42=Escape'
+setxkbmap -option caps:escape
 
 # set texlive bin path
 export PATH=$PATH:/usr/local/texlive/2019/bin/x86_64-linux
@@ -178,7 +179,7 @@ export TERM=xterm-256color
 
 ################################################################################
 # set Application path
-export PATH=$PATH:/home/xy/Applications:/usr/local/srslte/bin/
+export PATH=$PATH:/home/xy/Applications:/usr/local/srslte/bin/:/opt/ghc/bin
 # c/c++ include search dir
 #export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/local/include/
 #export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/include/
@@ -186,7 +187,7 @@ export PATH=$PATH:/home/xy/Applications:/usr/local/srslte/bin/
 #export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/srslte/include/
 # c/c++ library search dir
 #export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/lib/
-#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/srslte/lib/
 ################################################################################
 # python search dir
@@ -267,3 +268,9 @@ echo "use_proxy = on" >> ~/.wgetrc
 # (Bonus Settings! Not required for npm to work, but needed for lots of other programs)
 ######################
 echo "proxy=http://$proxy" > ~/.curlrc
+
+
+######################
+# GIT SETTINGS
+######################
+export git_token="2072874f0121f14f5f59b560f9334c76cf5b45e7"
