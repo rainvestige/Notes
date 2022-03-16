@@ -35,6 +35,7 @@ Record softwares and tools i used
 | [Anki]+[mpv]             | flash card & media   |
 | [via]                    | android web browser  |
 | [dvipng]                 | convert dvi to png   |
+| [stow]                   | a sym-link manager   |
 
 | Name       | Describe                                               |
 |------------|--------------------------------------------------------|
@@ -69,3 +70,4 @@ Record softwares and tools i used
 [mpv]: https://mpv.io/installation/
 [texlive]: https://mirrors.aliyun.com/CTAN/systems/texlive/
 [todo]: https://github.com/todotxt/todo.txt-cli
+[stow]: https://savannah.gnu.org/git/?group=stow
