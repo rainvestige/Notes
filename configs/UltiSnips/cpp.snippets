@@ -13,3 +13,21 @@ namespace $1 {
 $0
 }  // namespace $1
 endsnippet
+
+
+#snippet '(\{)' "auto curly brace" rA
+#`!p
+#a = match.group(1)
+#snip.rv = a
+#`
+#	$1
+#`!p snip.rv = "}" `$0
+#endsnippet
+#
+#priority 1
+#snippet '(= \{)' "auto curly brace initialize" rA
+#`!p
+#a = match.group(1)
+#snip.rv = a
+#`$1`!p snip.rv = "}"`$0
+#endsnippet

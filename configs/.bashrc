@@ -162,7 +162,7 @@ export EDITOR=/usr/local/vim8/bin/vim
 
 # Map Capslock to Escape
 #xmodmap -e 'clear Lock' -e 'keycode 0x42=Escape'
-setxkbmap -option caps:escape
+#setxkbmap -option caps:escape
 
 # set texlive bin path
 export PATH=$PATH:/usr/local/texlive/2019/bin/x86_64-linux
@@ -214,63 +214,63 @@ alias psudo='sudo env PATH=$PATH'
 alias todo="todo.sh"
 ################################################################################
 # custom env variables
-export remote1="xxy@10.12.17.88"
+export remote1="public@10.12.17.88"
 export remote2="xxy@10.81.204.9"
 
 
-######################
-# User Variables (Edit These!)
-######################
-#username="myusername"
-#password="mypassword"
-proxy="127.0.0.1:8888"
-
-######################
-# Environement Variables
-# (npm does use these variables, and they are vital to lots of applications)
-######################
-export HTTPS_PROXY="http://$proxy"
-export HTTP_PROXY="http://$proxy"
-export http_proxy="http://$proxy"
-export https_proxy="http://$proxy"
-export all_proxy="http://$proxy"
-export ftp_proxy="http://$proxy"
-export dns_proxy="http://$proxy"
-export rsync_proxy="http://$proxy"
-export no_proxy="127.0.0.10/8, localhost, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16"
-
-######################
-# npm Settings
-######################
-npm config set registry http://registry.npmjs.org/
-npm config set proxy "http://$proxy"
-npm config set https-proxy "http://$proxy"
-npm config set strict-ssl false
-echo "registry=http://registry.npmjs.org/" > ~/.npmrc
-echo "proxy=http://$proxy" >> ~/.npmrc
-echo "strict-ssl=false" >> ~/.npmrc
-echo "http-proxy=http://$proxy" >> ~/.npmrc
-echo "http_proxy=http://$proxy" >> ~/.npmrc
-echo "https_proxy=http://$proxy" >> ~/.npmrc
-echo "https-proxy=http://$proxy" >> ~/.npmrc
-
-######################
-# WGET SETTINGS
-# (Bonus Settings! Not required for npm to work, but needed for lots of other programs)
-######################
-echo "https_proxy = http://$proxy/" > ~/.wgetrc
-echo "http_proxy = http://$proxy/" >> ~/.wgetrc
-echo "ftp_proxy = http://$proxy/" >> ~/.wgetrc
-echo "use_proxy = on" >> ~/.wgetrc
-
-######################
-# CURL SETTINGS
-# (Bonus Settings! Not required for npm to work, but needed for lots of other programs)
-######################
-echo "proxy=http://$proxy" > ~/.curlrc
+#######################
+## User Variables (Edit These!)
+#######################
+##username="myusername"
+##password="mypassword"
+#proxy="10.12.17.109:8888"
+#
+#######################
+## Environement Variables
+## (npm does use these variables, and they are vital to lots of applications)
+#######################
+#export HTTPS_PROXY="http://$proxy"
+#export HTTP_PROXY="http://$proxy"
+#export http_proxy="http://$proxy"
+#export https_proxy="http://$proxy"
+#export all_proxy="http://$proxy"
+#export ftp_proxy="http://$proxy"
+#export dns_proxy="http://$proxy"
+#export rsync_proxy="http://$proxy"
+#export no_proxy="127.0.0.10/8, localhost, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16"
+#
+#######################
+## npm Settings
+#######################
+#npm config set registry http://registry.npmjs.org/
+#npm config set proxy "http://$proxy"
+#npm config set https-proxy "http://$proxy"
+#npm config set strict-ssl false
+#echo "registry=http://registry.npmjs.org/" > ~/.npmrc
+#echo "proxy=http://$proxy" >> ~/.npmrc
+#echo "strict-ssl=false" >> ~/.npmrc
+#echo "http-proxy=http://$proxy" >> ~/.npmrc
+#echo "http_proxy=http://$proxy" >> ~/.npmrc
+#echo "https_proxy=http://$proxy" >> ~/.npmrc
+#echo "https-proxy=http://$proxy" >> ~/.npmrc
+#
+#######################
+## WGET SETTINGS
+## (Bonus Settings! Not required for npm to work, but needed for lots of other programs)
+#######################
+#echo "https_proxy = http://$proxy/" > ~/.wgetrc
+#echo "http_proxy = http://$proxy/" >> ~/.wgetrc
+#echo "ftp_proxy = http://$proxy/" >> ~/.wgetrc
+#echo "use_proxy = on" >> ~/.wgetrc
+#
+#######################
+## CURL SETTINGS
+## (Bonus Settings! Not required for npm to work, but needed for lots of other programs)
+#######################
+#echo "proxy=http://$proxy" > ~/.curlrc
 
 
 ######################
 # GIT SETTINGS
 ######################
-export git_token="2072874f0121f14f5f59b560f9334c76cf5b45e7"
+export git_token=""

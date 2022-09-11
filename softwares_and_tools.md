@@ -27,6 +27,7 @@ Record softwares and tools i used
 | [synergy]                | mouse keyboard share |
 | [barrier]                | mouse keyboard share |
 | [draw.io]                | draw diagram         |
+| [inkscape]               | draw freely         |
 | [appimagelauncher]       | linux appimage       |
 | [cheat.sh]               | cheatsheet           |
 | [flat-remix-gnome]       | gnome theme          |

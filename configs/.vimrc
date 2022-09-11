@@ -20,6 +20,9 @@ filetype plugin on
 filetype plugin indent on
 set encoding=utf-8
 let &t_ut=''
+"
+"
+set directory=$HOME/.vim/swapfiles/
 "##########################################################"
 " FINDING FILES:
 
@@ -191,12 +194,12 @@ call plug#end()
 "==
 syntax enable
 set background=dark
-call togglebg#map("<F5>")
-let g:solarized_termcolors=16
-let g:solarized_termtrans=1
-let g:solarized_visibility="normal"
-colorscheme solarized
-"colorscheme iceberg
+"call togglebg#map("<F5>")
+"let g:solarized_termcolors=256
+"let g:solarized_termtrans=1
+"let g:solarized_visibility="normal"
+"colorscheme solarized
+colorscheme iceberg
 
 "==
 "== you complete me setting
@@ -339,7 +342,6 @@ set conceallevel=1
 let g:tex_conceal='abdmg'
 let g:vimtex_compiler_latexmk = {
     \ 'options' : [
-    \   '-xelatex',
     \
     \ ],
     \}
@@ -354,6 +356,7 @@ let g:vimtex_quickfix_latexlog = {
 let g:vimtex_quickfix_ignore_filters = [
       \ 'Unused global option',
       \ 'Font shape',
+      \ 'contains only floats',
       \]
 
 " ==
